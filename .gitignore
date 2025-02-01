@@ -1,0 +1,56 @@
+# Ignore Visual Studio and Rider files
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.cache
+
+# Ignore build artifacts
+bin/
+obj/
+
+# Ignore MAUI-specific temporary files
+AppPackages/
+*.app
+*.apk
+*.aab
+*.ipa
+*.pdb
+*.ds_store
+*.tlog
+*.cache
+*.ilk
+*.log
+*.ncb
+*.sdf
+*.suo
+*.swp
+*.tlog
+*.tmp
+
+# Ignore macOS-specific files
+*.DS_Store
+
+# Ignore Windows-specific files
+Thumbs.db
+Desktop.ini
+
+# Ignore generated files from dependencies
+node_modules/
+wwwroot/node_modules/
+packages/
+.nuget/
+project.lock.json
+
+# Ignore JetBrains Rider IDE files
+.idea/
+*.iml
+
+# Ignore Razor web hybrid-specific files
+wwwroot/
+*.g.cs
+*.razor.g.cs
+*.razor.g.i.cs
+obj/**/*.razor.g.cs
+obj/**/*.razor.g.i.cs
