@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using Gitpilot.Components.Common
 
 <div class="page">
     <article class="content">
@@ -18,9 +19,27 @@
         <button>Branch  </button>
         <button>Stash   </button>
         <button>Pop     </button>
+        <button class="plus-button" @onclick="TuggleCustomDialogVisibility">+</button>
     </div>
+    <CustomDialog 
+        IsVisible=isCustomDialogVisible 
+        OnVisibilityFalse="TuggleCustomDialogVisibility"
+    >
+        <div class="dialog-container">
+            <CustomButton>Clone Repository</CustomButton>
+            <CustomButton>Open Repository</CustomButton>
+        </div>
+    </CustomDialog>
 </div>
 
 @code {
-
+    private bool isCustomDialogVisible = false;
+    private void TuggleCustomDialogVisibility()
+    {
+        isCustomDialogVisible = !isCustomDialogVisible;
+    }
+    private void TuggleCustomDialogVisibilityOff()
+    {
+        isCustomDialogVisible = false;
+    }
 }

@@ -1,0 +1,29 @@
+﻿<div>
+    @if (IsVisible)
+    {
+        <div class="dialog-container">
+            <div class="dialog-close-trigger" @onclick="TuggleDialog"></div>
+            <div class="dialog">
+                <div class="top-bar">
+                    <button class="dialog-close-button" @onclick="TuggleDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    @ChildContent
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; } = true;
+    [Parameter] public EventCallback<bool> OnVisibilityFalse { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private void TuggleDialog()
+    {
+        IsVisible = !IsVisible;
+        OnVisibilityFalse.InvokeAsync(false);
+    }
+    
+}

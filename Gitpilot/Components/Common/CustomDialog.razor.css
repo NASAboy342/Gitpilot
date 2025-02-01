@@ -1,0 +1,34 @@
+﻿.dialog-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(2px);
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.dialog-close-trigger {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+.dialog {
+    height: 500px;
+    width: 500px;
+    background-color: var(--background-color);
+}
+.top-bar{
+    display: flex;
+    position: relative;
+    width: 100%;
+    justify-content: end;
+    padding: 0px 5px;
+}
+.dialog-close-button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    position: relative;
+}
