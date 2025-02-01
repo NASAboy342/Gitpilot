@@ -1,0 +1,46 @@
+﻿.page{
+    color: white;
+    font-family:Calibri;
+    
+}
+.quick-access-bar {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    background-color: rgb(51, 55, 63);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    font-size:13px;
+}
+    .quick-access-bar button {
+        background-color: rgb(51, 55, 63);
+        color: white;
+        border: none;
+    }
+.side-nav-bar {
+    position: absolute;
+    width: 400px;
+    height: 100%;
+    background-color: rgb(39, 42, 49);
+    left: 0px;
+    padding-top: 50px;
+    padding-left: 15px;
+}
+.app-name-cotainer{
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 20px;
+}
+.gitpiot-name{
+
+}
+.content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(28, 30, 35);
+    padding-top: 50px;
+    padding-left: 400px;
+}
