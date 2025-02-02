@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @using Gitpilot.Components.Common
+@using Gitpilot.Models
+@using Gitpilot.Services
 
 <div class="page">
     <article class="content">
@@ -22,18 +24,20 @@
         <button class="plus-button" @onclick="TuggleCustomDialogVisibility">+</button>
     </div>
     <CustomDialog 
-        IsVisible=isCustomDialogVisible 
-        OnVisibilityFalse="TuggleCustomDialogVisibility"
+    IsVisible=isCustomDialogVisible 
+    OnVisibilityFalse="TuggleCustomDialogVisibility"
     >
         <div class="dialog-container">
-            <CustomButton>Clone Repository</CustomButton>
-            <CustomButton>Open Repository</CustomButton>
+            <div><CustomButton>Clone Repository</CustomButton></div>
+            <div @onclick="HandleFilePicker"><CustomButton>Open Repository</CustomButton></div>
         </div>
+        <div>@SelectedRepo?.FolderPath</div>
     </CustomDialog>
 </div>
 
 @code {
     private bool isCustomDialogVisible = false;
+    private FolderResult? SelectedRepo;
     private void TuggleCustomDialogVisibility()
     {
         isCustomDialogVisible = !isCustomDialogVisible;
@@ -41,5 +45,10 @@
     private void TuggleCustomDialogVisibilityOff()
     {
         isCustomDialogVisible = false;
+    }
+    private async Task HandleFilePicker()
+    {
+        var windowsFolderPicker = new WindowsFolderPickerService();
+        SelectedRepo = await windowsFolderPicker.PickFolderAsync();
     }
 }
