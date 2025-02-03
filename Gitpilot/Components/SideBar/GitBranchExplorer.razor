@@ -1,0 +1,77 @@
+﻿@using Gitpilot.Models
+@using Newtonsoft.Json
+<div class="container">
+    <div class="section" id="local">
+        <div class="folder" onclick="toggleFolder(this)">📂 LOCAL</div>
+        <div class="branches">
+            @foreach (var branch in LocalBranches.Where(lb => !lb.IsAFolder))
+            {
+                <div class="branch">🌿 @branch.FullName</div>
+            }
+            @foreach (var folder in LocalBranches.Where(lb => lb.IsAFolder).GroupBy(lb => lb.FolderName))
+            {
+                <div class="folder" onclick="toggleFolder(this)">📂 @folder.Key</div>
+                <div class="branches">
+                    @foreach (var branch in folder)
+                    {
+                        <div class="branch">🌿 @branch.Name</div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="draggable" id="dragBar"></div>
+    <div class="section" id="remote">
+        <div class="folder" onclick="toggleFolder(this)">📂 REMOTE (74/74)</div>
+        <div class="branches">
+            @foreach (var branch in RemoteBranches.Where(lb => !lb.IsAFolder))
+            {
+                <div class="branch">🌿 @branch.FullName</div>
+            }
+            @foreach (var folder in RemoteBranches.Where(lb => lb.IsAFolder).GroupBy(lb => lb.FolderName))
+            {
+                <div class="folder" onclick="toggleFolder(this)">📂 @folder.Key</div>
+                <div class="branches">
+                    @foreach (var branch in folder)
+                    {
+                        <div class="branch">🌿 @branch.Name</div>   
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleFolder(element) {
+    element.classList.toggle("open");
+    }
+
+    // Drag to resize
+    const dragBar = document.getElementById("dragBar");
+    const localSection = document.getElementById("local");
+    const remoteSection = document.getElementById("remote");
+
+    let isDragging = false;
+
+    dragBar.addEventListener("mousedown", function (e) {
+    isDragging = true;
+    document.addEventListener("mousemove", onDrag);
+    document.addEventListener("mouseup", () => {
+    isDragging = false;
+    document.removeEventListener("mousemove", onDrag);
+    });
+    });
+
+    function onDrag(e) {
+    if (!isDragging) return;
+    let newHeight = e.clientY - localSection.offsetTop;
+    localSection.style.height = newHeight + "px";
+    remoteSection.style.height = `calc(100vh - ${newHeight + 10}px)`;
+    }
+</script>
+
+@code {
+    [Parameter] public List<GitBranch> LocalBranches { get; set; } = [];
+    [Parameter] public List<GitBranch> RemoteBranches { get; set; } = [];
+}

@@ -1,7 +1,13 @@
 ﻿@inherits LayoutComponentBase
 @using Gitpilot.Components.Common
+@using Gitpilot.Components.SideBar
 @using Gitpilot.Models
+@using Gitpilot.Models.Parameters
 @using Gitpilot.Services
+@using Gitpilot.Services.Interfaces
+@inject IFolderPickerService windowsFolderPicker
+@inject IGitRepositoryService gitRepositoryService
+@using Newtonsoft.Json
 
 <div class="page">
     <article class="content">
@@ -10,6 +16,9 @@
     <div class="side-nav-bar">
         <div class="app-name-cotainer">
             <div class="gitpiot-name">Gitpilot</div>
+        </div>
+        <div class="gitbranch-info">
+            <GitBranchExplorer LocalBranches="_gitRepository.LocalBranches" RemoteBranches="_gitRepository.RemoteBranches"></GitBranchExplorer>
         </div>
     </div>
     <div class="quick-access-bar">
@@ -29,15 +38,17 @@
     >
         <div class="dialog-container">
             <div><CustomButton>Clone Repository</CustomButton></div>
-            <div @onclick="HandleFilePicker"><CustomButton>Open Repository</CustomButton></div>
+            <div @onclick="HandleRepoFolderPickIng"><CustomButton>Open Repository</CustomButton></div>
         </div>
-        <div>@SelectedRepo?.FolderPath</div>
     </CustomDialog>
 </div>
 
 @code {
     private bool isCustomDialogVisible = false;
-    private FolderResult? SelectedRepo;
+    private FolderResult? _selectedRepo;
+    private GitRepository? _gitRepository = new GitRepository();
+
+
     private void TuggleCustomDialogVisibility()
     {
         isCustomDialogVisible = !isCustomDialogVisible;
@@ -46,9 +57,9 @@
     {
         isCustomDialogVisible = false;
     }
-    private async Task HandleFilePicker()
+    private async Task HandleRepoFolderPickIng()
     {
-        var windowsFolderPicker = new WindowsFolderPickerService();
-        SelectedRepo = await windowsFolderPicker.PickFolderAsync();
+        _selectedRepo = await windowsFolderPicker.PickFolderAsync();
+        _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam{ DirectoryPath = _selectedRepo.FolderPath }).Data;
     }
 }

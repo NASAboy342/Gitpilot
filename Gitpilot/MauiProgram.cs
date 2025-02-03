@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using CommunityToolkit.Maui;
+using Gitpilot.Services.Interfaces;
+using Gitpilot.Services;
 
 namespace Gitpilot
 {
@@ -18,6 +20,8 @@ namespace Gitpilot
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddSingleton<IGitRepositoryService, GitRepositoryService>();
+            builder.Services.AddSingleton<IFolderPickerService, WindowsFolderPickerService>();
 
 #if DEBUG
     		builder.Services.AddBlazorWebViewDeveloperTools();
