@@ -48,7 +48,6 @@ project.lock.json
 *.iml
 
 # Ignore Razor web hybrid-specific files
-wwwroot/
 *.g.cs
 *.razor.g.cs
 *.razor.g.i.cs

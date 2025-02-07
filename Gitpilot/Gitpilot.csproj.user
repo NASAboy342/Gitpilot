@@ -8,6 +8,15 @@
     <AppxShowAllApps>False</AppxShowAllApps>
     <_LastSelectedProfileId>MSIX-win10-x861.pubxml</_LastSelectedProfileId>
     <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
+    <Source>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</Source>
+    <SmallTileSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</SmallTileSource>
+    <MediumTileSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</MediumTileSource>
+    <WideTileSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</WideTileSource>
+    <LargeTileSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</LargeTileSource>
+    <AppIconSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</AppIconSource>
+    <SplashScreenSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</SplashScreenSource>
+    <PackageLogoSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</PackageLogoSource>
+    <BadgeLogoSource>D:\Clones\Gitpilot\Gitpilot\wwwroot\GitpilotIcon.png</BadgeLogoSource>
   </PropertyGroup>
   <ItemGroup>
     <None Update="App.xaml">
