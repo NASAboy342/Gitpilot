@@ -12,5 +12,7 @@ namespace Gitpilot.Services.Interfaces
     public interface IGitRepositoryService
     {
         OpenRepoResponse OpenRepository(OpentRepoParam param);
+        Task<GetAllOpentGitRepositoryResponse> GetAllOpentGitRepository();
+        Task<GetLastOpentGitRepositoryResponse> GetLastOpentGitRepository();
     }
 }

@@ -48,7 +48,14 @@
     private bool isCustomDialogVisible = false;
     private FolderResult? _selectedRepo;
     private GitRepository? _gitRepository = new GitRepository();
+    private List<GitRepository> _allOpenedGitRepositories = new List<GitRepository>();
+    private LastSelectedGitRepository? _lastSelectedGitRepository;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await GetAllOpentRepositories();
+        await GetLastOpentRepository();
+    }
 
     private void TuggleCustomDialogVisibility()
     {
@@ -62,5 +69,16 @@
     {
         _selectedRepo = await windowsFolderPicker.PickFolderAsync();
         _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam{ DirectoryPath = _selectedRepo.FolderPath }).Data;
+        //await gitRepositoryService.SaveGitRepository(_gitRepository);
+    }
+    private async Task GetAllOpentRepositories()
+    {
+        var allOpenedGitRepositories = await gitRepositoryService.GetAllOpentGitRepository();
+        _allOpenedGitRepositories = allOpenedGitRepositories.Repositories;
+    }
+    private async Task GetLastOpentRepository()
+    {
+        var lastOpenedGitRepository = await gitRepositoryService.GetLastOpentGitRepository();
+        _lastSelectedGitRepository = lastOpenedGitRepository.Repository;
     }
 }

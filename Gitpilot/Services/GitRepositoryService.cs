@@ -8,12 +8,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LibGit2Sharp;
+using Gitpilot.Repositories.Interfaces;
 
 namespace Gitpilot.Services
 {
     public class GitRepositoryService : IGitRepositoryService
     {
-        
+        private readonly IGitpilotRepository _gitpilotRepository;
+
+        public GitRepositoryService(IGitpilotRepository gitpilotRepository)
+        {
+            _gitpilotRepository = gitpilotRepository;
+        }
+
         public OpenRepoResponse OpenRepository(OpentRepoParam param)
         {
             var repository = new Repository(param.DirectoryPath);
@@ -59,6 +66,24 @@ namespace Gitpilot.Services
         {
             var gitBranches = repository.Branches.Where(branch => !branch.IsRemote).Select(branch => new GitBranch(branch.FriendlyName));
             return gitBranches.ToList();
+        }
+
+        public async Task<GetAllOpentGitRepositoryResponse> GetAllOpentGitRepository()
+        {
+            var gitRepositories = await _gitpilotRepository.GetAllOpenedGitRepositories();
+            return new GetAllOpentGitRepositoryResponse()
+            {
+                Repositories = gitRepositories
+            };
+        }
+
+        public async Task<GetLastOpentGitRepositoryResponse> GetLastOpentGitRepository()
+        {
+            var gitRepository = await _gitpilotRepository.GetLastSelectedGitRepository();
+            return new GetLastOpentGitRepositoryResponse()
+            {
+                Repository = gitRepository
+            };
         }
     }
 }

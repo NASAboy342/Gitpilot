@@ -1,5 +1,19 @@
-﻿
+﻿@using Gitpilot.Components.Common
+<div class="container">
+    <div class="repository-container">
+        <div class="repository-label">Repository</div>
+        <CustomDropdownList Options="Options" OnOptionSelected="OnSelectRepository" />
+    </div>
+    <div class="branch-container">
+        <div class="branch-label">Current Branch</div>
+        <div class="branch-name">@CurrentBranch</div>
+    </div>
+</div>
+
+
 
 @code {
-
+    private List<string> Options = new List<string> { "Option 1", "Option 2", "Option 3" };
+    private string CurrentBranch = "master";
+    [Parameter] public EventCallback<string> OnSelectRepository { get; set; }
 }

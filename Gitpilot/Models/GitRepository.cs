@@ -1,15 +1,18 @@
 ﻿
+using SQLite;
+
 namespace Gitpilot.Models
 {
     public class GitRepository
     {
-        public int Id { get; set; }
+        [PrimaryKey, AutoIncrement] public int Id { get; set; }
         public string Name { get; set; } = "";
-        public GitBranch CurrenBranch { get; set; } = new GitBranch();
-        public List<GitBranch> LocalBranches { get; set; } = [];
-        public List<GitBranch> RemoteBranches { get; set; } = [];
-        public List<GitChange> NotStagedChanges { get; set; } = [];
-        public List<GitChange> StagedChanges { get; set; } = [];
-        public List<GitStash> Stashes { get; set; } = [];
+        public string Path { get; set; } = "";
+        [Ignore] public GitBranch CurrenBranch { get; set; } = new GitBranch();
+        [Ignore] public List<GitBranch> LocalBranches { get; set; } = [];
+        [Ignore] public List<GitBranch> RemoteBranches { get; set; } = [];
+        [Ignore] public List<GitChange> NotStagedChanges { get; set; } = [];
+        [Ignore] public List<GitChange> StagedChanges { get; set; } = [];
+        [Ignore] public List<GitStash> Stashes { get; set; } = [];
     }
 }

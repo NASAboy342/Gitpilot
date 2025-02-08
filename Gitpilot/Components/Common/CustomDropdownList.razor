@@ -1,0 +1,29 @@
+﻿<div class="custom-dropdown">
+    <button class="custom-dropdown-btn" @onclick="TuggleDropdownList">@SelectedOption ⌟</button>
+    <ul class="custom-dropdown-list" style="display:@DropdownDisplayStyle">
+        @foreach(var option in Options)
+        {
+            <li data-value="@option" @onclick="async () => { await SelectOption(option);}">@option</li>
+        }
+    </ul>
+</div>
+
+@code {
+    private bool IsShowDropdownList = false;
+    private string DropdownDisplayStyle => IsShowDropdownList ? "block" : "none";
+    [Parameter] public List<string> Options { get; set; }
+    [Parameter] public EventCallback<string> OnOptionSelected { get; set; }
+    public string SelectedOption { get; set; } = "Select an option";
+
+    private void TuggleDropdownList()
+    {
+        IsShowDropdownList = !IsShowDropdownList;
+    }
+
+    private async Task SelectOption(string option)
+    {
+        SelectedOption = option;
+        IsShowDropdownList = false;
+        await OnOptionSelected.InvokeAsync(option);
+    }
+}

@@ -2,6 +2,8 @@
 using CommunityToolkit.Maui;
 using Gitpilot.Services.Interfaces;
 using Gitpilot.Services;
+using Gitpilot.Repositories.Interfaces;
+using Gitpilot.Repositories;
 
 namespace Gitpilot
 {
@@ -22,6 +24,7 @@ namespace Gitpilot
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddSingleton<IGitRepositoryService, GitRepositoryService>();
             builder.Services.AddSingleton<IFolderPickerService, WindowsFolderPickerService>();
+            builder.Services.AddSingleton<IGitpilotRepository, GitpilotRepository>();
 
 #if DEBUG
     		builder.Services.AddBlazorWebViewDeveloperTools();

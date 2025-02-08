@@ -1,0 +1,29 @@
+﻿.container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items:center;
+    height: 50px;
+}
+.repository-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.repository-label{
+    font-size: 10px;
+    opacity: 0.6;
+    padding-left: 5px;
+}
+.repository-select {
+    background-color: transparent;
+    border: none;
+    color: white
+}
+.repository-select:focus-visible{
+    outline: none;
+}
+.branch-label {
+    font-size: 10px;
+    opacity: 0.6;
+}
