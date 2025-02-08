@@ -51,19 +51,13 @@ namespace Gitpilot.Services
 
         private List<GitBranch> GetRemoteBranches(Repository repository)
         {
-            var gitBranches = repository.Branches.Where(branch => branch.IsRemote).Select(branch => new GitBranch
-            {
-                FullName = branch.FriendlyName
-            });
+            var gitBranches = repository.Branches.Where(branch => branch.IsRemote).Select(branch => new GitBranch(branch.FriendlyName));
             return gitBranches.ToList();
         }
 
         private List<GitBranch> GetLocalBranches(Repository repository)
         {
-            var gitBranches = repository.Branches.Where(branch => !branch.IsRemote).Select(branch => new GitBranch
-            {
-                FullName = branch.FriendlyName
-            });
+            var gitBranches = repository.Branches.Where(branch => !branch.IsRemote).Select(branch => new GitBranch(branch.FriendlyName));
             return gitBranches.ToList();
         }
     }

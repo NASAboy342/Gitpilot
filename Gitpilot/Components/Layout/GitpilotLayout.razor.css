@@ -32,6 +32,11 @@
     margin-top: 10px;
     font-weight: bold;
     font-size: 20px;
+    position: absolute;
+    margin-left: 10px;
+    display: flex;
+    height: 30px;
+    gap: 10px;
 }
 .gitpiot-name{
 
@@ -55,4 +60,8 @@
     flex-direction:column;
     align-items:center;
     padding: 10px;
+}
+.git-status-container{
+    position: absolute;
+
 }

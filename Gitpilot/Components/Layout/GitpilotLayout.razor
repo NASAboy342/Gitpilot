@@ -14,9 +14,6 @@
         @Body
     </article>
     <div class="side-nav-bar">
-        <div class="app-name-cotainer">
-            <div class="gitpiot-name">Gitpilot</div>
-        </div>
         <div class="gitbranch-info">
             <GitBranchExplorer LocalBranches="_gitRepository.LocalBranches" RemoteBranches="_gitRepository.RemoteBranches"></GitBranchExplorer>
         </div>
@@ -32,10 +29,14 @@
         <button>Pop     </button>
         <button class="plus-button" @onclick="TuggleCustomDialogVisibility">+</button>
     </div>
-    <CustomDialog 
-    IsVisible=isCustomDialogVisible 
-    OnVisibilityFalse="TuggleCustomDialogVisibility"
-    >
+    <div class="app-name-cotainer">
+        <img src="GitpilotIcon.png" alt="Icon"/>
+        <div class="gitpiot-name">Gitpilot</div>
+    </div>
+    <div class="git-status-container">
+        <GitStatus />
+    </div>
+    <CustomDialog IsVisible=isCustomDialogVisible OnVisibilityFalse="TuggleCustomDialogVisibility">
         <div class="dialog-container">
             <div><CustomButton>Clone Repository</CustomButton></div>
             <div @onclick="HandleRepoFolderPickIng"><CustomButton>Open Repository</CustomButton></div>

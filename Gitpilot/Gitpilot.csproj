@@ -44,6 +44,8 @@
         <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
         <GenerateTestArtifacts>True</GenerateTestArtifacts>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <DefaultLanguage>en</DefaultLanguage>
+        <PackageIcon>$placeholder$.altform-lightunplated_targetsize-256.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -69,6 +71,13 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\Icons\$placeholder$.altform-lightunplated_targetsize-256.png">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
     </ItemGroup>
 
     <ItemGroup>

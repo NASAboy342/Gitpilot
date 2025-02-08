@@ -35,6 +35,9 @@
         <uap:DefaultTile Square71x71Logo="wwwroot\Icons\$placeholder$.png" Wide310x150Logo="wwwroot\Icons\$placeholder$.png" Square310x310Logo="wwwroot\Icons\$placeholder$.png"  ShortName="GP">
         </uap:DefaultTile >
         <uap:SplashScreen Image="wwwroot\Icons\$placeholder$.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+          <uap:Rotation Preference="landscapeFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>

@@ -4,3 +4,29 @@
     --background-color: rgb(28, 30, 35);
     --secondary-color-hover: rgb(33, 41,57);
 }
+
+body {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+}
+
+/* WebKit Browsers */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+

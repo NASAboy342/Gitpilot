@@ -20,24 +20,28 @@
             }
         </div>
     </div>
-    <div class="draggable" id="dragBar"></div>
+    @* <div class="draggable" id="dragBar"></div> *@
     <div class="section" id="remote">
         <div class="folder" onclick="toggleFolder(this)">📂 REMOTE (74/74)</div>
         <div class="branches">
-            @foreach (var branch in RemoteBranches.Where(lb => !lb.IsAFolder))
-            {
-                <div class="branch">🌿 @branch.FullName</div>
-            }
-            @foreach (var folder in RemoteBranches.Where(lb => lb.IsAFolder).GroupBy(lb => lb.FolderName))
-            {
-                <div class="folder" onclick="toggleFolder(this)">📂 @folder.Key</div>
-                <div class="branches">
-                    @foreach (var branch in folder)
-                    {
-                        <div class="branch">🌿 @branch.Name</div>   
-                    }
-                </div>
-            }
+            <div class="folder" onclick="toggleFolder(this)">🌐 Origin</div>
+            <div class="branches">
+                @foreach (var branch in RemoteBranches.Where(lb => !lb.IsAFolder))
+                {
+                    <div class="branch">🌿 @branch.FullName</div>
+                }
+                @foreach (var folder in RemoteBranches.Where(lb => lb.IsAFolder).GroupBy(lb => lb.FolderName))
+                {
+                    <div class="folder" onclick="toggleFolder(this)">📂 @folder.Key</div>
+                    <div class="branches">
+                        @foreach (var branch in folder)
+                        {
+                            <div class="branch">🌿 @branch.Name</div>
+                        }
+                    </div>
+                }
+            </div>
+
         </div>
     </div>
 </div>
@@ -74,4 +78,6 @@
 @code {
     [Parameter] public List<GitBranch> LocalBranches { get; set; } = [];
     [Parameter] public List<GitBranch> RemoteBranches { get; set; } = [];
+
+    
 }
