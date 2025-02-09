@@ -8,6 +8,6 @@ namespace Gitpilot.Models.Responses
 {
     public class GetLastOpentGitRepositoryResponse: BaseResponse
     {
-        public LastSelectedGitRepository Repository { get; set; }
+        public GitRepository Repository { get; set; } = new GitRepository();
     }
 }

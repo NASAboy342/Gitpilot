@@ -10,7 +10,7 @@ namespace Gitpilot.Repositories
 {
     public class GitpilotRepository : BaseRepository, IGitpilotRepository
     {
-        private static readonly string _dataBasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Gitpilot.db3");
+        private static readonly string _dataBasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), "Gitpilot.db3");
 
         public GitpilotRepository() : base(_dataBasePath)
         {
@@ -32,6 +32,11 @@ namespace Gitpilot.Repositories
         {
             await CreateTableAsync<GitRepository>();
             await CreateTableAsync<LastSelectedGitRepository>();
+        }
+
+        public async Task<int> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository)
+        {
+            return await SaveItemAsync(lastSelectedGitRepository);
         }
 
         public async Task<int> SaveRepository(GitRepository repository)

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Gitpilot.Models.Responses
 {
-    public class OpenRepoResponse: BaseResponse
+    public class SaveGitRepositoryResponse : BaseResponse
     {
-        public GitRepository GitRepositoryData { get; set; }
+        public int Id { get; set; }
     }
 }

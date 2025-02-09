@@ -23,5 +23,6 @@ namespace Gitpilot.Enums
         NoChangesToPop = 17,
         NoChangesToMergeBase = 18,
         CacheReloadFailed = 19,
+        NoRepositories = 20,
     }
 }

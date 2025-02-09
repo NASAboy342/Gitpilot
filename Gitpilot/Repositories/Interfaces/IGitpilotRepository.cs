@@ -11,6 +11,7 @@ namespace Gitpilot.Repositories.Interfaces
     {
         Task<List<GitRepository>> GetAllOpenedGitRepositories();
         Task<LastSelectedGitRepository> GetLastSelectedGitRepository();
+        Task<int> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository);
         Task<int> SaveRepository(GitRepository repository);
     }
 }

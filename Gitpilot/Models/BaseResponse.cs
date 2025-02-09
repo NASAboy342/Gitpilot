@@ -14,6 +14,12 @@ namespace Gitpilot.Models
             ErrorMessage = sucess.ToString();
         }
 
+        public BaseResponse(Exception ex)
+        {
+            ErrorCode = (int)ErrorEnum.GeneralError;
+            ErrorMessage = ex.Message;
+        }
+
         public BaseResponse(ErrorEnum cacheReloadFailed)
         {
             ErrorCode = (int)cacheReloadFailed;

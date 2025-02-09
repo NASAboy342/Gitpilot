@@ -19,7 +19,15 @@ namespace Gitpilot.Repositories
         }
         public async Task CreateTableAsync<T>() where T : new()
         {
-            await _database.CreateTableAsync<T>();
+            try
+            {
+                await _database.CreateTableAsync<T>();
+            }
+            catch (Exception ex)
+            {
+            }
+            
+            var some = "";
         }
         public async Task<List<T>> GetItemsAsync<T>() where T : new()
         {

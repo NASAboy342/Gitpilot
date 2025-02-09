@@ -1,5 +1,6 @@
 ﻿using Gitpilot.Enums;
 using Gitpilot.Models;
+using Gitpilot.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,12 @@ namespace Gitpilot.Caches
     public class GitRepositoryCache : CacheBase<List<GitRepository>>
     {
         private readonly string _key = "Gitpilot_GitRepositoryCache";
+        private readonly IGitpilotRepository _gitpilotRepository;
+
+        public GitRepositoryCache(IGitpilotRepository gitpilotRepository)
+        {
+            _gitpilotRepository = gitpilotRepository;
+        }
 
         protected override CacheItemPolicy GetItemPolicy()
         {
@@ -21,25 +28,33 @@ namespace Gitpilot.Caches
             };
         }
 
-        protected override Task<List<GitRepository>> ReloadFromDb(string key)
+        protected override async Task<List<GitRepository>> ReloadFromDb(string key)
         {
-            throw new NotImplementedException();
+            var gitRepositories = await _gitpilotRepository.GetAllOpenedGitRepositories();
+            return gitRepositories;
         }
 
-        public async Task<List<GitRepository>> GetAllAsync()
+        public async Task<List<GitRepository>> GetAllAsync(bool isForcReload = false)
         {
+            if (isForcReload)
+            {
+                await ForceReload();
+            }
             return await GetAsync(_key);
         }
 
         public async Task<BaseResponse> ForceReload()
         {
-            ClearAll();
-            var reloadResult = await GetAsync(_key);
-            if (reloadResult == null || reloadResult.Count == 0)
+            try
             {
-                return new BaseResponse(ErrorEnum.CacheReloadFailed);
+                var dataFormDb = await ReloadFromDb(_key);
+                AddOrUpdate(_key, dataFormDb);
+                return new BaseResponse();
             }
-            return new BaseResponse();
+            catch (Exception ex)
+            {
+                return new BaseResponse(ex);
+            }
         }
     }
 }

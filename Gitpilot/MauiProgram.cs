@@ -4,6 +4,7 @@ using Gitpilot.Services.Interfaces;
 using Gitpilot.Services;
 using Gitpilot.Repositories.Interfaces;
 using Gitpilot.Repositories;
+using Gitpilot.Caches;
 
 namespace Gitpilot
 {
@@ -25,9 +26,10 @@ namespace Gitpilot
             builder.Services.AddSingleton<IGitRepositoryService, GitRepositoryService>();
             builder.Services.AddSingleton<IFolderPickerService, WindowsFolderPickerService>();
             builder.Services.AddSingleton<IGitpilotRepository, GitpilotRepository>();
+            builder.Services.AddSingleton<GitRepositoryCache>();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 

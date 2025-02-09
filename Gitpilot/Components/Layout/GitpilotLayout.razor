@@ -34,7 +34,7 @@
         <div class="gitpiot-name">Gitpilot</div>
     </div>
     <div class="git-status-container">
-        <GitStatus />
+        <GitStatus Options="_allRepoNames" OnSelectRepository="HandleSwitchRepo"></GitStatus>
     </div>
     <CustomDialog IsVisible=isCustomDialogVisible OnVisibilityFalse="TuggleCustomDialogVisibility">
         <div class="dialog-container">
@@ -46,14 +46,13 @@
 
 @code {
     private bool isCustomDialogVisible = false;
-    private FolderResult? _selectedRepo;
     private GitRepository? _gitRepository = new GitRepository();
     private List<GitRepository> _allOpenedGitRepositories = new List<GitRepository>();
     private LastSelectedGitRepository? _lastSelectedGitRepository;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private List<string> _allRepoNames => _allOpenedGitRepositories.Select(g => g.Name).ToList();
+    protected override async Task OnInitializedAsync()
     {
-        await GetAllOpentRepositories();
+        await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam());
         await GetLastOpentRepository();
     }
 
@@ -67,18 +66,31 @@
     }
     private async Task HandleRepoFolderPickIng()
     {
-        _selectedRepo = await windowsFolderPicker.PickFolderAsync();
-        _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam{ DirectoryPath = _selectedRepo.FolderPath }).Data;
-        //await gitRepositoryService.SaveGitRepository(_gitRepository);
+        var selectedRepoFolder = await windowsFolderPicker.PickFolderAsync();
+        var opentRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepoFolder.FolderPath }).GitRepositoryData;
+        var saveGitRepositoryResponse = await gitRepositoryService.SaveGitRepository(opentRepository);
+        await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam{IsForceReloadCache = true});
+        var lastInsertedRepo = _allOpenedGitRepositories.OrderByDescending(r => r.Id).FirstOrDefault();
+        var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = lastInsertedRepo.Id, Name = lastInsertedRepo.Name });
+        await GetLastOpentRepository();
     }
-    private async Task GetAllOpentRepositories()
+    private async Task GetAllOpentRepositories(GetAllOpentGitRepositoryParam param)
     {
-        var allOpenedGitRepositories = await gitRepositoryService.GetAllOpentGitRepository();
+        var allOpenedGitRepositories = await gitRepositoryService.GetAllOpentGitRepository(param);
         _allOpenedGitRepositories = allOpenedGitRepositories.Repositories;
     }
     private async Task GetLastOpentRepository()
     {
         var lastOpenedGitRepository = await gitRepositoryService.GetLastOpentGitRepository();
-        _lastSelectedGitRepository = lastOpenedGitRepository.Repository;
+        _gitRepository = lastOpenedGitRepository.Repository;
+    }
+    private async Task HandleSwitchRepo(string selectedRepo)
+    {
+        var selectedRepository = _allOpenedGitRepositories.FirstOrDefault(x => x.Name == selectedRepo);
+        var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = selectedRepository.Id, Name = selectedRepository.Name });
+        if (selectedRepository != null)
+        {
+            _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepository .Path}).GitRepositoryData;
+        }
     }
 }
