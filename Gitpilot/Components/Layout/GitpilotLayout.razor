@@ -34,7 +34,7 @@
         <div class="gitpiot-name">Gitpilot</div>
     </div>
     <div class="git-status-container">
-        <GitStatus Options="_allRepoNames" OnSelectRepository="HandleSwitchRepo"></GitStatus>
+        <GitStatus Options="_allRepoNames" CurrentRepository="@_gitRepository.Name" OnSelectRepository="HandleSwitchRepo" CurrentBranch="@_gitRepository.CurrenBranch.Name"></GitStatus>
     </div>
     <CustomDialog IsVisible=isCustomDialogVisible OnVisibilityFalse="TuggleCustomDialogVisibility">
         <div class="dialog-container">

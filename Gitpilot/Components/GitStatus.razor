@@ -2,7 +2,7 @@
 <div class="container">
     <div class="repository-container">
         <div class="repository-label">Repository</div>
-        <CustomDropdownList Options="Options" OnOptionSelected="HandleSelectRepo" />
+        <CustomDropdownList Options="Options" SelectedOption="@CurrentRepository" OnOptionSelected="HandleSelectRepo" />
     </div>
     <div class="branch-container">
         <div class="branch-label">Current Branch</div>
@@ -15,11 +15,11 @@
 @code {
     [Parameter] public EventCallback<string> OnSelectRepository { get; set; }
     [Parameter] public List<string> Options { get; set; } = [];
+    [Parameter] public string CurrentBranch { get; set; } = "";
+    [Parameter] public string CurrentRepository { get; set; } = "";
 
-    private string CurrentBranch = "";
     private async Task HandleSelectRepo(string selectedRepo)
     {
-        CurrentBranch = selectedRepo;
         await OnSelectRepository.InvokeAsync(selectedRepo);
     }
 }

@@ -13,7 +13,7 @@
     private string DropdownDisplayStyle => IsShowDropdownList ? "block" : "none";
     [Parameter] public List<string> Options { get; set; }
     [Parameter] public EventCallback<string> OnOptionSelected { get; set; }
-    public string SelectedOption { get; set; } = "Select an option";
+    [Parameter] public string SelectedOption { get; set; } = "Select an option";
 
     private void TuggleDropdownList()
     {
