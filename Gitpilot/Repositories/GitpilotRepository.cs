@@ -25,7 +25,7 @@ namespace Gitpilot.Repositories
         public async Task<LastSelectedGitRepository> GetLastSelectedGitRepository()
         {
             var gits = await GetItemsAsync<LastSelectedGitRepository>();
-            return gits.FirstOrDefault() ?? new LastSelectedGitRepository();
+            return gits.OrderByDescending(g => g.Id).FirstOrDefault() ?? new LastSelectedGitRepository();
         }
 
         public override async Task InitializeTablesAsync()

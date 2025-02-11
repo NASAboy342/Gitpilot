@@ -1,4 +1,5 @@
 ﻿
+using LibGit2Sharp;
 using SQLite;
 
 namespace Gitpilot.Models
@@ -14,5 +15,6 @@ namespace Gitpilot.Models
         [Ignore] public List<GitChange> NotStagedChanges { get; set; } = [];
         [Ignore] public List<GitChange> StagedChanges { get; set; } = [];
         [Ignore] public List<GitStash> Stashes { get; set; } = [];
+        [Ignore] public Repository LibGitRepository { get; set; }
     }
 }

@@ -11,6 +11,7 @@ using LibGit2Sharp;
 using Gitpilot.Repositories.Interfaces;
 using Gitpilot.Caches;
 using Gitpilot.Enums;
+using Gitpilot.Queues;
 
 namespace Gitpilot.Services
 {
@@ -18,11 +19,13 @@ namespace Gitpilot.Services
     {
         private readonly IGitpilotRepository _gitpilotRepository;
         private readonly GitRepositoryCache _gitRepositoryCache;
+        private readonly MessageQueue _messageQueue;
 
-        public GitRepositoryService(IGitpilotRepository gitpilotRepository, GitRepositoryCache gitRepositoryCache)
+        public GitRepositoryService(IGitpilotRepository gitpilotRepository, GitRepositoryCache gitRepositoryCache, MessageQueue messageQueue)
         {
             _gitpilotRepository = gitpilotRepository;
             _gitRepositoryCache = gitRepositoryCache;
+            _messageQueue = messageQueue;
         }
 
         public OpenRepoResponse OpenRepository(OpentRepoParam param)
@@ -38,7 +41,8 @@ namespace Gitpilot.Services
                 NotStagedChanges = GetNotStagedChanges(repository),
                 StagedChanges = GetStagedChanges(repository),
                 Stashes = GetStashes(repository),
-                Path = repository.Info.WorkingDirectory
+                Path = repository.Info.WorkingDirectory,
+                LibGitRepository = repository,
             };
             return new OpenRepoResponse()
             {
@@ -122,6 +126,42 @@ namespace Gitpilot.Services
             {
                 Id = insertedId
             };
+        }
+
+        public async Task<SwichtToBranchResponse> SwichtToBranch(SwichtToBranchParam param)
+        {
+            try
+            {
+                var targetBranch = param.Repository.LibGitRepository.Branches[param.BranchName];
+
+                Commands.Checkout(param.Repository.LibGitRepository, targetBranch);
+
+                var currentRepo = param.Repository;
+                currentRepo.CurrenBranch = new GitBranch(currentRepo.LibGitRepository.Head.FriendlyName);
+                currentRepo.LocalBranches = GetLocalBranches(currentRepo.LibGitRepository);
+                currentRepo.RemoteBranches = GetRemoteBranches(currentRepo.LibGitRepository);
+                currentRepo.NotStagedChanges = GetNotStagedChanges(currentRepo.LibGitRepository);
+                currentRepo.StagedChanges = GetStagedChanges(currentRepo.LibGitRepository);
+                currentRepo.Stashes = GetStashes(currentRepo.LibGitRepository);
+
+                var successResult = new SwichtToBranchResponse()
+                {
+                    Repository = currentRepo
+                };
+                _messageQueue.Enqueue(successResult);
+                return successResult;
+            }
+            catch (Exception ex)
+            {
+                var errorResult = new SwichtToBranchResponse
+                {
+                    ErrorCode = 1,
+                    ErrorMessage = $"{ex}",
+                };
+                _messageQueue.Enqueue(errorResult);
+                return errorResult;
+            }
+            
         }
     }
 }

@@ -6,7 +6,11 @@
         <div class="branches">
             @foreach (var branch in LocalBranches.Where(lb => !lb.IsAFolder))
             {
-                <div class="branch">🌿 @branch.FullName</div>
+                <div 
+                    @ondblclick="async () => {await SwitchBranch(branch.Name);}"
+                     class="@(CurrentBranch.Equals(branch.Name) ? "current-branch" : "branch")">
+                    🌿 @branch.FullName
+                </div>
             }
             @foreach (var folder in LocalBranches.Where(lb => lb.IsAFolder).GroupBy(lb => lb.FolderName))
             {
@@ -14,7 +18,11 @@
                 <div class="branches">
                     @foreach (var branch in folder)
                     {
-                        <div class="branch">🌿 @branch.Name</div>
+                        <div 
+                            @ondblclick="async () => {await SwitchBranch(branch.Name);}"
+                             class="@(CurrentBranch.Equals(branch.Name) ? "current-branch" : "branch")">
+                            🌿 @branch.Name
+                        </div>
                     }
                 </div>
             }
@@ -28,7 +36,11 @@
             <div class="branches">
                 @foreach (var branch in RemoteBranches.Where(lb => !lb.IsAFolder))
                 {
-                    <div class="branch">🌿 @branch.FullName</div>
+                    <div @ondblclick="async () => {await SwitchBranch(branch.Name);}"
+                         class="branch"
+                    >
+                        🌿 @branch.FullName
+                    </div>
                 }
                 @foreach (var folder in RemoteBranches.Where(lb => lb.IsAFolder).GroupBy(lb => lb.FolderName))
                 {
@@ -36,7 +48,12 @@
                     <div class="branches">
                         @foreach (var branch in folder)
                         {
-                            <div class="branch">🌿 @branch.Name</div>
+                            <div 
+                                @ondblclick="async () => {await SwitchBranch(branch.Name);}" 
+                                class="branch"
+                            >
+                                🌿 @branch.Name
+                            </div>
                         }
                     </div>
                 }
@@ -78,6 +95,11 @@
 @code {
     [Parameter] public List<GitBranch> LocalBranches { get; set; } = [];
     [Parameter] public List<GitBranch> RemoteBranches { get; set; } = [];
+    [Parameter] public string CurrentBranch { get; set; } = "";
+    [Parameter] public EventCallback<string> OnSwitchBranch { get; set; }
 
-    
+    private async Task SwitchBranch(string branchName)
+    {
+        await OnSwitchBranch.InvokeAsync(branchName);
+    }
 }

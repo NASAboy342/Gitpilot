@@ -1,0 +1,54 @@
+﻿.container {
+    position: absolute;
+    bottom: 0px;
+    top: 0px;
+    width: 500px;
+    margin: unset;
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+    pointer-events: none;
+    justify-content: end;
+    padding: 70px 20px;
+    gap: 5px;
+    font-size:14px;
+}
+.message-box {
+    min-height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgb(255, 255, 255, 0.09);
+    pointer-events:all;
+    padding: 0px 10px;
+}
+
+.success{
+    background-color: rgb(42, 255, 0, 0.11);
+    
+}
+
+.error {
+    background-color: rgb(255, 0, 0, 0.17);
+    
+}
+.close-button-container{
+    height: 90%;
+    font-size: 16px;
+}
+.close-button{
+    cursor: pointer;
+}
+.close-button:hover{
+    font-weight: bold;
+}
+    .close-button:active {
+        color: gray;
+        font-weight: bold;
+    }
+
+.message-text{
+    padding: 10px 10px;
+}

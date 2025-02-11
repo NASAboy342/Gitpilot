@@ -1,0 +1,49 @@
+﻿@using Gitpilot.Models
+@using Gitpilot.Queues
+@inject MessageQueue messageQueue
+
+<div class="container">
+    @foreach (var baseResponse in _baseResponses)
+    {
+        <div class="message-box @(baseResponse.ErrorCode == 0 ? "success" : "error")">
+            <div>@(baseResponse.ErrorCode == 0 ? "✓" : "✕")</div>
+            <div class="message-text" >@baseResponse.ErrorMessage</div>
+            <div class="close-button-container"><div @onclick="() => {CloseThisMessage(_baseResponses.IndexOf(baseResponse));}" class="close-button">✕</div></div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<BaseResponse> _baseResponses = new List<BaseResponse>();
+
+    private void CloseThisMessage(int baseResponsesIndex)
+    {
+        _baseResponses.RemoveAt(baseResponsesIndex);
+    }
+
+    private async Task ListenForErrorMessage()
+    {
+        while (true)
+        {
+            DequeueIfHaveNewMessage();
+            await Task.Delay(TimeSpan.FromSeconds(0.2));
+        }
+    }
+
+    private async Task RemoveErrorMessageWhenItsTime()
+    {
+        while (true)
+        {
+            if (_baseResponses.Count > 0)
+                _baseResponses.RemoveAll(r => (DateTime.Now - r.CreatedTime) > TimeSpan.FromSeconds(5));
+
+            await Task.Delay(TimeSpan.FromSeconds(0.2));
+        }
+    }
+
+    private void DequeueIfHaveNewMessage()
+    {
+        if (!messageQueue.IsEmpty())
+            _baseResponses.Add(messageQueue.Dequeue());
+    }
+}

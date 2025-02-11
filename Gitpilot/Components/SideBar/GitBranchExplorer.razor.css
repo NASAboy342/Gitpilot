@@ -31,13 +31,30 @@
 
 .branch {
     padding: 2px 0;
+    user-select: none;
 }
+    .branch:hover {
+        background-color: var(--primary-color);
+        cursor: pointer;
+    }
+    .branch:active {
+        background-color: var(--primary-color-hover)
+    }
 
-.folder, .branch {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.current-branch {
+    padding: 2px 0;
+    user-select: none;
+    background-color: var(--primary-color);
 }
+    .current-branch:active {
+        background-color: var(--primary-color-hover);
+    }
+
+    .folder, .branch {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
     .folder.open + .branches {
         display: block;

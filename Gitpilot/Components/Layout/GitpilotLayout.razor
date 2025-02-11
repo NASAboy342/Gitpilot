@@ -15,7 +15,7 @@
     </article>
     <div class="side-nav-bar">
         <div class="gitbranch-info">
-            <GitBranchExplorer LocalBranches="_gitRepository.LocalBranches" RemoteBranches="_gitRepository.RemoteBranches"></GitBranchExplorer>
+            <GitBranchExplorer LocalBranches="_gitRepository.LocalBranches" RemoteBranches="_gitRepository.RemoteBranches" CurrentBranch="@_gitRepository.CurrenBranch.Name" OnSwitchBranch="SwichtToBranch"></GitBranchExplorer>
         </div>
     </div>
     <div class="quick-access-bar">
@@ -42,6 +42,7 @@
             <div @onclick="HandleRepoFolderPickIng"><CustomButton>Open Repository</CustomButton></div>
         </div>
     </CustomDialog>
+    <ErrorBoxs />
 </div>
 
 @code {
@@ -67,12 +68,7 @@
     private async Task HandleRepoFolderPickIng()
     {
         var selectedRepoFolder = await windowsFolderPicker.PickFolderAsync();
-        var opentRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepoFolder.FolderPath }).GitRepositoryData;
-        var saveGitRepositoryResponse = await gitRepositoryService.SaveGitRepository(opentRepository);
-        await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam{IsForceReloadCache = true});
-        var lastInsertedRepo = _allOpenedGitRepositories.OrderByDescending(r => r.Id).FirstOrDefault();
-        var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = lastInsertedRepo.Id, Name = lastInsertedRepo.Name });
-        await GetLastOpentRepository();
+        await SwichtToTheOpentRepo(selectedRepoFolder);
     }
     private async Task GetAllOpentRepositories(GetAllOpentGitRepositoryParam param)
     {
@@ -92,5 +88,24 @@
         {
             _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepository .Path}).GitRepositoryData;
         }
+    }
+    private async Task SwichtToTheOpentRepo(FolderResult folderResult)
+    {
+        var opentRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = folderResult.FolderPath }).GitRepositoryData;
+        var saveGitRepositoryResponse = await gitRepositoryService.SaveGitRepository(opentRepository);
+        await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam { IsForceReloadCache = true });
+        var lastInsertedRepo = _allOpenedGitRepositories.OrderByDescending(r => r.Id).FirstOrDefault();
+        var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = lastInsertedRepo.Id, Name = lastInsertedRepo.Name });
+        await GetLastOpentRepository();
+    }
+    private async Task SwichtToBranch(string branchName)
+    {
+        var swichtToBranchResponse = await gitRepositoryService.SwichtToBranch(new SwichtToBranchParam 
+            {
+                BranchName = branchName,
+                Repository = _gitRepository
+            });
+
+        _gitRepository = swichtToBranchResponse.Repository;
     }
 }
