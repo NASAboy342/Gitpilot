@@ -146,9 +146,10 @@ namespace Gitpilot.Services
 
                 var successResult = new SwichtToBranchResponse()
                 {
-                    Repository = currentRepo
+                    Repository = currentRepo,
+                    ErrorMessage = $"Success fully checkout to {targetBranch.FriendlyName}"
                 };
-                _messageQueue.Enqueue(successResult);
+                _messageQueue.Send(successResult);
                 return successResult;
             }
             catch (Exception ex)
@@ -158,7 +159,7 @@ namespace Gitpilot.Services
                     ErrorCode = 1,
                     ErrorMessage = $"{ex}",
                 };
-                _messageQueue.Enqueue(errorResult);
+                _messageQueue.Send(errorResult);
                 return errorResult;
             }
             

@@ -1,5 +1,8 @@
 ﻿@using Gitpilot.Models
 @using Gitpilot.Queues
+@using Newtonsoft.Json
+
+@implements IDisposable
 @inject MessageQueue messageQueue
 
 <div class="container">
@@ -15,35 +18,63 @@
 
 @code {
     private List<BaseResponse> _baseResponses = new List<BaseResponse>();
+    private Timer _timer;
+
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(UpdateComponent, null, TimeSpan.Zero, TimeSpan.FromSeconds(0.5));
+    }
+
+    private void UpdateComponent(object state)
+    {
+        DequeueIfHaveNewMessage();
+        RemoveErrorMessageWhenItsTime();
+
+        InvokeAsync(StateHasChanged);
+    }
 
     private void CloseThisMessage(int baseResponsesIndex)
     {
-        _baseResponses.RemoveAt(baseResponsesIndex);
-    }
-
-    private async Task ListenForErrorMessage()
-    {
-        while (true)
+        try
         {
-            DequeueIfHaveNewMessage();
-            await Task.Delay(TimeSpan.FromSeconds(0.2));
+            _baseResponses.RemoveAt(baseResponsesIndex);
+        }
+        catch (Exception ex)
+        {
+            messageQueue.Send(new BaseResponse(ex));
         }
     }
 
-    private async Task RemoveErrorMessageWhenItsTime()
+    private void RemoveErrorMessageWhenItsTime()
     {
-        while (true)
+        try
         {
             if (_baseResponses.Count > 0)
-                _baseResponses.RemoveAll(r => (DateTime.Now - r.CreatedTime) > TimeSpan.FromSeconds(5));
-
-            await Task.Delay(TimeSpan.FromSeconds(0.2));
+                _baseResponses.RemoveAll(r => (DateTime.Now - r.CreatedTime) > TimeSpan.FromSeconds(10));
         }
+        catch (Exception ex)
+        {
+            messageQueue.Send(new BaseResponse(ex));
+        }
+
     }
 
     private void DequeueIfHaveNewMessage()
     {
-        if (!messageQueue.IsEmpty())
-            _baseResponses.Add(messageQueue.Dequeue());
+        try
+        {
+            if (!messageQueue.IsEmpty())
+                _baseResponses.Add(messageQueue.Dequeue());
+        }
+        catch (Exception ex)
+        {
+            messageQueue.Send(new BaseResponse(ex));
+        }
     }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+
 }

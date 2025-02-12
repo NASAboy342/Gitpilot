@@ -7,7 +7,7 @@
             @foreach (var branch in LocalBranches.Where(lb => !lb.IsAFolder))
             {
                 <div 
-                    @ondblclick="async () => {await SwitchBranch(branch.Name);}"
+                    @ondblclick="async () => {await SwitchBranch(branch.FullName);}"
                      class="@(CurrentBranch.Equals(branch.Name) ? "current-branch" : "branch")">
                     🌿 @branch.FullName
                 </div>
@@ -19,7 +19,7 @@
                     @foreach (var branch in folder)
                     {
                         <div 
-                            @ondblclick="async () => {await SwitchBranch(branch.Name);}"
+                            @ondblclick="async () => {await SwitchBranch(branch.FullName);}"
                              class="@(CurrentBranch.Equals(branch.Name) ? "current-branch" : "branch")">
                             🌿 @branch.Name
                         </div>
@@ -36,7 +36,7 @@
             <div class="branches">
                 @foreach (var branch in RemoteBranches.Where(lb => !lb.IsAFolder))
                 {
-                    <div @ondblclick="async () => {await SwitchBranch(branch.Name);}"
+                    <div @ondblclick="async () => {await SwitchBranch(branch.FullName);}"
                          class="branch"
                     >
                         🌿 @branch.FullName
@@ -49,7 +49,7 @@
                         @foreach (var branch in folder)
                         {
                             <div 
-                                @ondblclick="async () => {await SwitchBranch(branch.Name);}" 
+                                @ondblclick="async () => {await SwitchBranch(branch.FullName);}" 
                                 class="branch"
                             >
                                 🌿 @branch.Name
