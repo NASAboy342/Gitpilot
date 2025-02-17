@@ -19,18 +19,22 @@
 @code {
     private List<BaseResponse> _baseResponses = new List<BaseResponse>();
     private Timer _timer;
+    private bool _isJobDone = true;
 
     protected override void OnInitialized()
     {
-        _timer = new Timer(UpdateComponent, null, TimeSpan.Zero, TimeSpan.FromSeconds(0.5));
+        _timer = new Timer(UpdateComponent, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
-    private void UpdateComponent(object state)
+    private async void UpdateComponent(object state)
     {
+        if (!_isJobDone) return;
+        _isJobDone = false;
         DequeueIfHaveNewMessage();
         RemoveErrorMessageWhenItsTime();
 
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
+        _isJobDone = true;
     }
 
     private void CloseThisMessage(int baseResponsesIndex)
@@ -50,7 +54,7 @@
         try
         {
             if (_baseResponses.Count > 0)
-                _baseResponses.RemoveAll(r => (DateTime.Now - r.CreatedTime) > TimeSpan.FromSeconds(10));
+                _baseResponses.RemoveAll(r => (DateTime.Now - r.CreatedTime) > TimeSpan.FromSeconds(15));
         }
         catch (Exception ex)
         {

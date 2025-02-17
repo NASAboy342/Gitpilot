@@ -8,6 +8,17 @@
         <div class="branch-label">Current Branch</div>
         <div class="branch-name">@CurrentBranch</div>
     </div>
+    <div class="quick-access-bar">
+        <button>Undo    </button>
+        <button>Redo    </button>
+        <button>Fetch   </button>
+        <button>Pull    </button>
+        <button>Push    </button>
+        <button>Branch  </button>
+        <button>Stash   </button>
+        <button>Pop     </button>
+        <button class="plus-button" @onclick="TuggleCustomDialogVisibility">+</button>
+    </div>
 </div>
 
 
@@ -17,9 +28,15 @@
     [Parameter] public List<string> Options { get; set; } = [];
     [Parameter] public string CurrentBranch { get; set; } = "";
     [Parameter] public string CurrentRepository { get; set; } = "";
+    [Parameter] public EventCallback OnClickPlushIcon { get; set; }
 
     private async Task HandleSelectRepo(string selectedRepo)
     {
-        await OnSelectRepository.InvokeAsync(selectedRepo);
+        OnSelectRepository.InvokeAsync(selectedRepo);
+    }
+
+    private void TuggleCustomDialogVisibility()
+    {
+        OnClickPlushIcon.InvokeAsync();
     }
 }

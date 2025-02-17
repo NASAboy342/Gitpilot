@@ -5,8 +5,10 @@
     align-items:center;
     height: 50px;
 }
-.repository-container{
+.repository-container {
     display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
     flex-direction: column;
     justify-content: center;
 }
@@ -26,4 +28,33 @@
 .branch-label {
     font-size: 10px;
     opacity: 0.6;
+    white-space:nowrap;
+}
+.branch-container {
+    max-width: 200px;
+}
+.branch-name {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.quick-access-bar {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 13px;
+    margin-left: 5vw;
+}
+
+.quick-access-bar button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+.plus-button {
+    font-size: 24px;
+    font-weight: bold;
 }

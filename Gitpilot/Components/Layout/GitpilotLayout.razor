@@ -1,13 +1,19 @@
 ﻿@inherits LayoutComponentBase
 @using Gitpilot.Components.Common
 @using Gitpilot.Components.SideBar
+@using Gitpilot.Helpers
 @using Gitpilot.Models
 @using Gitpilot.Models.Parameters
+@using Gitpilot.Queues
 @using Gitpilot.Services
 @using Gitpilot.Services.Interfaces
 @inject IFolderPickerService windowsFolderPicker
 @inject IGitRepositoryService gitRepositoryService
 @using Newtonsoft.Json
+@inject IServiceProvider serviceProvider
+@inject MessageQueue messageQueue
+
+@implements IDisposable
 
 <div class="page">
     <article class="content">
@@ -18,23 +24,16 @@
             <GitBranchExplorer LocalBranches="_gitRepository.LocalBranches" RemoteBranches="_gitRepository.RemoteBranches" CurrentBranch="@_gitRepository.CurrenBranch.Name" OnSwitchBranch="SwichtToBranch"></GitBranchExplorer>
         </div>
     </div>
+
+
     <div class="quick-access-bar">
-        <button>Undo    </button>
-        <button>Redo    </button>
-        <button>Fetch   </button>
-        <button>Pull    </button>
-        <button>Push    </button>
-        <button>Branch  </button>
-        <button>Stash   </button>
-        <button>Pop     </button>
-        <button class="plus-button" @onclick="TuggleCustomDialogVisibility">+</button>
-    </div>
-    <div class="app-name-cotainer">
-        <img src="GitpilotIcon.png" alt="Icon"/>
-        <div class="gitpiot-name">Gitpilot</div>
-    </div>
-    <div class="git-status-container">
-        <GitStatus Options="_allRepoNames" CurrentRepository="@_gitRepository.Name" OnSelectRepository="HandleSwitchRepo" CurrentBranch="@_gitRepository.CurrenBranch.Name"></GitStatus>
+        <div class="app-name-cotainer">
+            <img src="GitpilotIcon.png" alt="Icon" />
+            <div class="gitpiot-name">Gitpilot</div>
+        </div>
+        <div class="git-status-container">
+            <GitStatus Options="_allRepoNames" CurrentRepository="@_gitRepository.Name" OnSelectRepository="HandleSwitchRepo" CurrentBranch="@_gitRepository.CurrenBranch.Name" OnClickPlushIcon="TuggleCustomDialogVisibility"></GitStatus>
+        </div>
     </div>
     <CustomDialog IsVisible=isCustomDialogVisible OnVisibilityFalse="TuggleCustomDialogVisibility">
         <div class="dialog-container">
@@ -52,10 +51,37 @@
     private List<GitRepository> _allOpenedGitRepositories = new List<GitRepository>();
     private LastSelectedGitRepository? _lastSelectedGitRepository;
     private List<string> _allRepoNames => _allOpenedGitRepositories.Select(g => g.Name).ToList();
+    private Timer _timer;
+    private bool _isSyncRepoDone = true;
+
     protected override async Task OnInitializedAsync()
     {
-        await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam());
-        await GetLastOpentRepository();
+        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
+        {
+            await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam());
+            await GetLastOpentRepository();
+            _timer = new Timer(SyncRepoStatus, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+        }
+    }
+
+    private async void SyncRepoStatus(object state)
+    {
+        if (!_isSyncRepoDone) return;
+        _isSyncRepoDone = false;
+        try
+        {
+            gitRepositoryService.SyncRepoStatus(_gitRepository);
+            await InvokeAsync(StateHasChanged);
+        }catch(Exception ex)
+        {
+            messageQueue.Send(new BaseResponse(ex));
+        }
+        _isSyncRepoDone = true;
+    }
+
+    public void Dispose()
+    {
+        _timer.Dispose();
     }
 
     private void TuggleCustomDialogVisibility()
@@ -83,30 +109,39 @@
     }
     private async Task HandleSwitchRepo(string selectedRepo)
     {
-        var selectedRepository = _allOpenedGitRepositories.FirstOrDefault(x => x.Name == selectedRepo);
-        var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = selectedRepository.Id, Name = selectedRepository.Name });
-        if (selectedRepository != null)
+        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
         {
-            _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepository .Path}).GitRepositoryData;
+            var selectedRepository = _allOpenedGitRepositories.FirstOrDefault(x => x.Name == selectedRepo);
+            var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = selectedRepository.Id, Name = selectedRepository.Name });
+            if (selectedRepository != null)
+            {
+                _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepository.Path }).GitRepositoryData;
+            }
         }
     }
     private async Task SwichtToTheOpentRepo(FolderResult folderResult)
     {
-        var opentRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = folderResult.FolderPath }).GitRepositoryData;
-        var saveGitRepositoryResponse = await gitRepositoryService.SaveGitRepository(opentRepository);
-        await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam { IsForceReloadCache = true });
-        var lastInsertedRepo = _allOpenedGitRepositories.OrderByDescending(r => r.Id).FirstOrDefault();
-        var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = lastInsertedRepo.Id, Name = lastInsertedRepo.Name });
-        await GetLastOpentRepository();
+        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
+        {
+            var opentRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = folderResult.FolderPath }).GitRepositoryData;
+            var saveGitRepositoryResponse = await gitRepositoryService.SaveGitRepository(opentRepository);
+            await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam { IsForceReloadCache = true });
+            var lastInsertedRepo = _allOpenedGitRepositories.OrderByDescending(r => r.Id).FirstOrDefault();
+            var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = lastInsertedRepo.Id, Name = lastInsertedRepo.Name });
+            await GetLastOpentRepository();
+        }
     }
     private async Task SwichtToBranch(string branchName)
     {
-        var swichtToBranchResponse = await gitRepositoryService.SwichtToBranch(new SwichtToBranchParam 
-            {
-                BranchName = branchName,
-                Repository = _gitRepository
-            });
+        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
+        {
+            var swichtToBranchResponse = await gitRepositoryService.SwichtToBranch(new SwichtToBranchParam
+                {
+                    BranchName = branchName,
+                    Repository = _gitRepository
+                });
 
-        _gitRepository = swichtToBranchResponse.Repository;
+            _gitRepository = swichtToBranchResponse.Repository;
+        }
     }
 }

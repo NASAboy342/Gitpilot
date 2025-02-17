@@ -6,6 +6,7 @@ using Gitpilot.Repositories.Interfaces;
 using Gitpilot.Repositories;
 using Gitpilot.Caches;
 using Gitpilot.Queues;
+using Gitpilot.Helpers;
 
 namespace Gitpilot
 {
@@ -29,6 +30,8 @@ namespace Gitpilot
             builder.Services.AddSingleton<IGitpilotRepository, GitpilotRepository>();
             builder.Services.AddSingleton<GitRepositoryCache>();
             builder.Services.AddSingleton<MessageQueue>();
+            builder.Services.AddSingleton<OnloadingQueue>();
+            builder.Services.AddTransient<OnLoading>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

@@ -1,7 +1,66 @@
-﻿<div class="containner">
-    <div class="loading-ora"></div>
+﻿@using Gitpilot.Models
+@using Gitpilot.Queues
+@using Newtonsoft.Json
+@inject OnloadingQueue onloadingQueue
+@inject MessageQueue messageQueue
+
+@implements IDisposable
+
+<div class="containner">
+    @if (_isShowLoading)
+    {
+        <div class="loading-ora"></div>
+    }
 </div>
 
 @code {
+    private Timer _timer;
+    private List<LoadingInfo> _loadings = new List<LoadingInfo>();
+    private bool _isShowLoading = false;
+    private bool _isJobDone = true;
 
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(ListenForLoading, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+    }
+
+    private async void ListenForLoading(object state)
+    {
+        if (!_isJobDone) return;
+        _isJobDone = false;
+        try
+        {
+            TakeLoadingInfoIfHave();
+            CheckIfLoadingHaveCloseSignle();
+            CheckToShowLoading();
+        }
+        catch (Exception ex)
+        {
+            messageQueue.Send(new BaseResponse(ex));
+        }
+        await InvokeAsync(StateHasChanged);
+        _isJobDone = true;
+    }
+
+    private void TakeLoadingInfoIfHave()
+    {
+        if (!onloadingQueue.IsEmpty())
+            _loadings.Add(onloadingQueue.Dequeue());
+    }
+
+    private void CheckIfLoadingHaveCloseSignle()
+    {
+        var loadingHashesNeedToClose = _loadings.GroupBy(l => l.LoadingHash).Where(g => g.Count() > 1).Select(g => g.Key);
+        _loadings.RemoveAll(l => loadingHashesNeedToClose.Contains(l.LoadingHash));
+    }
+
+    private void CheckToShowLoading()
+    {
+        _isShowLoading = _loadings.Count > 0;
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
 }

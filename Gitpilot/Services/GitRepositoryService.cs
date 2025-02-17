@@ -164,5 +164,16 @@ namespace Gitpilot.Services
             }
             
         }
+
+        public void SyncRepoStatus(GitRepository gitRepository)
+        {
+            gitRepository.LibGitRepository.RetrieveStatus();
+            gitRepository.CurrenBranch = new GitBranch(gitRepository.LibGitRepository.Head.FriendlyName);
+            gitRepository.LocalBranches = GetLocalBranches(gitRepository.LibGitRepository);
+            gitRepository.RemoteBranches = GetRemoteBranches(gitRepository.LibGitRepository);
+            gitRepository.NotStagedChanges = GetNotStagedChanges(gitRepository.LibGitRepository);
+            gitRepository.StagedChanges = GetStagedChanges(gitRepository.LibGitRepository);
+            gitRepository.Stashes = GetStashes(gitRepository.LibGitRepository);
+        }
     }
 }

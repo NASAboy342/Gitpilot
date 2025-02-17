@@ -17,5 +17,6 @@ namespace Gitpilot.Services.Interfaces
         Task<SaveGitRepositoryResponse> SaveGitRepository(GitRepository gitRepository);
         Task<SaveLastOpentGitRepositoryResponse> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository);
         Task<SwichtToBranchResponse> SwichtToBranch(SwichtToBranchParam param);
+        void SyncRepoStatus(GitRepository gitRepository);
     }
 }

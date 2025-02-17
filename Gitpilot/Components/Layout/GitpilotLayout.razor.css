@@ -9,7 +9,6 @@
     height: 50px;
     background-color: var(--primary-color);
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 15px;
     font-size: 13px;
@@ -62,6 +61,6 @@
     padding: 10px;
 }
 .git-status-container{
-    position: absolute;
+    position: relative;
     margin-left: 120px;
 }
