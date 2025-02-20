@@ -12,12 +12,17 @@
         <div class="loading-ora"></div>
     }
 </div>
+@if (_isShowLoading)
+{
+    <div class="message">@_message</div>
+}
 
 @code {
     private Timer _timer;
     private List<LoadingInfo> _loadings = new List<LoadingInfo>();
     private bool _isShowLoading = false;
     private bool _isJobDone = true;
+    private string _message = "";
 
     protected override void OnInitialized()
     {
@@ -50,13 +55,15 @@
 
     private void CheckIfLoadingHaveCloseSignle()
     {
-        var loadingHashesNeedToClose = _loadings.GroupBy(l => l.LoadingHash).Where(g => g.Count() > 1).Select(g => g.Key);
+        var loadingHashesNeedToClose = new List<string>(_loadings.GroupBy(l => l.LoadingHash).Where(g => g.Count() > 1).Select(g => g.Key));
         _loadings.RemoveAll(l => loadingHashesNeedToClose.Contains(l.LoadingHash));
     }
 
     private void CheckToShowLoading()
     {
         _isShowLoading = _loadings.Count > 0;
+        var loadingsWithMessage = _loadings.Where(l => !string.IsNullOrEmpty(l.Message));
+        _message = loadingsWithMessage.Count() > 0 ? loadingsWithMessage.Last().Message : "";
     }
 
     public void Dispose()

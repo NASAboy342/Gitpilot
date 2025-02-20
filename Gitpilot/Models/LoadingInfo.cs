@@ -14,6 +14,13 @@ namespace Gitpilot.Models
             IsShouldBlock = false;
             CreatedTime = DateTime.Now;
         }
+        public LoadingInfo(string hash, string message)
+        {
+            LoadingHash = hash;
+            IsShouldBlock = false;
+            CreatedTime = DateTime.Now;
+            Message = message;
+        }
         public LoadingInfo(string hash, bool shouldBlock)
         {
             LoadingHash = hash;
@@ -23,5 +30,6 @@ namespace Gitpilot.Models
         public string LoadingHash { get; set; }
         public bool IsShouldBlock { get; set; }
         public DateTime CreatedTime { get; set; } = DateTime.Now;
+        public string Message { get; set; } = "";
     }
 }

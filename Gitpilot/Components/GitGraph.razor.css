@@ -1,0 +1,35 @@
+﻿.container{
+    overflow: auto;
+    padding: unset;
+    margin: unset;
+    position: relative;
+    max-width: none;
+}
+.commit-time-line-table{
+    width: 100%;
+    margin: unset;
+}
+.commit-time-line-header-row {
+    background-color: var(--secondary-color);
+    height: 25px;
+}
+    .commit-time-line-header-row th {
+        font-weight: bold;
+        padding: 0px 10px;
+        font-size: 12px;
+        color: var(--nonfocus-text-color);
+        border-left: 1px solid var(--tin-border-color);
+    }
+.commit-time-line-body-row td{
+}
+.branch-header {
+    width: 20%;
+}
+.graph-header{
+    width: 25%;
+}
+.commit-header{
+
+}
+.commit-time-line-body-commit-message {
+}

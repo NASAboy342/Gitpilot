@@ -4,6 +4,8 @@
     --background-color: rgb(28, 30, 35);
     --secondary-color-hover: rgb(33, 41,57);
     --primary-color-hover: rgb(61, 68, 82);
+    --nonfocus-text-color: rgb(105, 107, 113);
+    --tin-border-color: rgb(62, 64, 68);
 }
 
 body {

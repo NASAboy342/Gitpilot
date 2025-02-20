@@ -12,7 +12,12 @@
     height: 50px;
     animation: ora 2s linear infinite;
 }
-
+.message {
+    position: absolute;
+    bottom: 0px;
+    padding: 2px 10px;
+    background-color: var(--primary-color);
+}
 @keyframes ora {
     0% {
         box-shadow: 0 0 100px rgb(0, 239, 255, 0.30);

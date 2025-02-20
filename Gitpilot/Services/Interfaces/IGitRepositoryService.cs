@@ -1,6 +1,7 @@
 ﻿using Gitpilot.Models;
 using Gitpilot.Models.Parameters;
 using Gitpilot.Models.Responses;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace Gitpilot.Services.Interfaces
         Task<SaveLastOpentGitRepositoryResponse> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository);
         Task<SwichtToBranchResponse> SwichtToBranch(SwichtToBranchParam param);
         void SyncRepoStatus(GitRepository gitRepository);
+        List<GitCommit> GetCommits(Repository repository);
     }
 }

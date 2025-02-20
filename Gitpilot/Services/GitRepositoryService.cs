@@ -12,6 +12,7 @@ using Gitpilot.Repositories.Interfaces;
 using Gitpilot.Caches;
 using Gitpilot.Enums;
 using Gitpilot.Queues;
+using IEnumerable.ForEach;
 
 namespace Gitpilot.Services
 {
@@ -48,6 +49,33 @@ namespace Gitpilot.Services
             {
                 GitRepositoryData = gitRepository
             };
+        }
+
+        public List<GitCommit> GetCommits(Repository repository)
+        {
+            var allcommits = new List<GitCommit>();
+            repository.Branches.ForEach(branch =>
+            {
+                allcommits.AddRange(branch.Commits.Where(commit => commit.Committer.When > DateTime.Now.AddDays(-7)).Select(commit => new GitCommit
+                {
+                    Hash = commit.Sha,
+                    BranchName = branch.FriendlyName,
+                    Message = commit.MessageShort,
+                    CommitTime = commit.Committer.When,
+                    IsAMergeCommit = commit.Parents.Count() > 1,
+                    MergeFrom = commit.Parents.Count() > 1 ? commit.Parents.ToList()[1].Sha : ""
+                }).ToList());
+            });
+            allcommits = allcommits.OrderByDescending(c => c.CommitTime).GroupBy(c => c.Hash).Select(c => new GitCommit
+            {
+                Hash = c.Key,
+                BranchName = c.First().BranchName,
+                Message = c.First().Message,
+                CommitTime = c.First().CommitTime,
+                IsAMergeCommit = c.First().IsAMergeCommit,
+                MergeFrom = c.First().MergeFrom
+            }).ToList();
+            return allcommits;
         }
 
         private List<GitStash> GetStashes(Repository repository)

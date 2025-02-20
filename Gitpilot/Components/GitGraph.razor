@@ -1,0 +1,46 @@
+﻿@using Gitpilot.Helpers
+@using Gitpilot.Models
+@using Gitpilot.Services.Interfaces
+@inject IServiceProvider serviceProvider
+@inject IGitRepositoryService gitRepositoryService
+
+<div class="container">
+    <table class="commit-time-line-table">
+        <tr class="commit-time-line-header-row">
+            <th class="branch-header">BRANCH / TAG</th>
+            <th class="graph-header">GRAPH</th>
+            <th class="commit-header">COMMIT MESSAGE</th>
+        </tr>
+        @foreach(var commit in GitRepository.Commits)
+        {
+            <tr class="commit-time-line-body-row">
+                <td class="commit-time-line-body-branch">@commit.BranchName</td>
+                <td class="commit-time-line-body-graph"></td>
+                <td class="commit-time-line-body-commit-message">@commit.Message</td>
+            </tr>
+        }
+    </table>
+</div>
+
+@code {
+    [Parameter] public GitRepository GitRepository { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(() => GetCommits());
+    }
+
+    private async Task GetCommits()
+    {
+        using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Loading git-graph data"))
+        {
+            if (GitRepository.Commits.Count > 0) return;
+            while (GitRepository.LibGitRepository == null)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(0.5));
+            }
+            GitRepository.Commits = gitRepositoryService.GetCommits(GitRepository.LibGitRepository);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

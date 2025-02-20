@@ -31,7 +31,11 @@ namespace Gitpilot
             builder.Services.AddSingleton<GitRepositoryCache>();
             builder.Services.AddSingleton<MessageQueue>();
             builder.Services.AddSingleton<OnloadingQueue>();
-            builder.Services.AddTransient<OnLoading>();
+            builder.Services.AddTransient<Func<string, OnLoading>>(serviceProvider =>
+            {
+                var onloadingQueue = serviceProvider.GetRequiredService<OnloadingQueue>();
+                return message => new OnLoading(onloadingQueue, message);
+            });
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

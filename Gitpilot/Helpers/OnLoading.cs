@@ -12,17 +12,17 @@ namespace Gitpilot.Helpers
     {
         private string _loadingHash;
         private readonly OnloadingQueue _onloadingQueue;
-        public OnLoading(OnloadingQueue onloadingQueue)
+        public OnLoading(OnloadingQueue onloadingQueue, string message = "")
         {
             _onloadingQueue = onloadingQueue;
-            CreateLoadingRequest();
+            CreateLoadingRequest(message);
 
         }
 
-        private async Task CreateLoadingRequest()
+        private async Task CreateLoadingRequest(string message)
         {
             _loadingHash = Guid.NewGuid().ToString();
-            _onloadingQueue.Enqueue(new LoadingInfo(_loadingHash));
+            _onloadingQueue.Enqueue(new LoadingInfo(_loadingHash, message));
         }
 
         private async Task CreateStopLoadingRequest()

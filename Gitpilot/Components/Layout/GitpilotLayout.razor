@@ -17,7 +17,7 @@
 
 <div class="page">
     <article class="content">
-        @Body
+        <GitGraph GitRepository="_gitRepository" />
     </article>
     <div class="side-nav-bar">
         <div class="gitbranch-info">
@@ -56,7 +56,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
+        using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Initializing..."))
         {
             await GetAllOpentRepositories(new GetAllOpentGitRepositoryParam());
             await GetLastOpentRepository();
@@ -109,7 +109,7 @@
     }
     private async Task HandleSwitchRepo(string selectedRepo)
     {
-        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
+        using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Swiching Repo"))
         {
             var selectedRepository = _allOpenedGitRepositories.FirstOrDefault(x => x.Name == selectedRepo);
             var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = selectedRepository.Id, Name = selectedRepository.Name });
@@ -121,7 +121,7 @@
     }
     private async Task SwichtToTheOpentRepo(FolderResult folderResult)
     {
-        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
+        using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Swicht to the opent repo"))
         {
             var opentRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = folderResult.FolderPath }).GitRepositoryData;
             var saveGitRepositoryResponse = await gitRepositoryService.SaveGitRepository(opentRepository);
@@ -133,7 +133,7 @@
     }
     private async Task SwichtToBranch(string branchName)
     {
-        using (var loading = serviceProvider.GetRequiredService<OnLoading>())
+        using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Swiching branch"))
         {
             var swichtToBranchResponse = await gitRepositoryService.SwichtToBranch(new SwichtToBranchParam
                 {
