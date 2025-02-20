@@ -14,9 +14,13 @@
         @foreach(var commit in GitRepository.Commits)
         {
             <tr class="commit-time-line-body-row">
-                <td class="commit-time-line-body-branch">@commit.BranchName</td>
-                <td class="commit-time-line-body-graph"></td>
-                <td class="commit-time-line-body-commit-message">@commit.Message</td>
+                <td class="commit-time-line-body-branch-td"><div class="commit-time-line-body-branch">@commit.BranchName</div> </td>
+                <td class="commit-time-line-body-graph" >
+                    <svg height="20px" >
+                        <circle cx="20" cy="10" r="10" fill="rgb(0, 200, 255)"></circle>
+                    </svg>
+                </td>
+                <td><span class="commit-time-line-body-commit-message">@commit.Message</span></td>
             </tr>
         }
     </table>

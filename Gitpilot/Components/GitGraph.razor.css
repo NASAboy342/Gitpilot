@@ -1,5 +1,5 @@
 ﻿.container{
-    overflow: auto;
+    overflow:auto;
     padding: unset;
     margin: unset;
     position: relative;
@@ -20,7 +20,7 @@
         color: var(--nonfocus-text-color);
         border-left: 1px solid var(--tin-border-color);
     }
-.commit-time-line-body-row td{
+.commit-time-line-body-row {
 }
 .branch-header {
     width: 20%;
@@ -29,7 +29,32 @@
     width: 25%;
 }
 .commit-header{
-
+    width: 65%;
 }
 .commit-time-line-body-commit-message {
+    display:block;
+    width: calc(100vw - 800px);
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0px 10px;
+    font-size: 12px;
+}
+.commit-time-line-body-branch-td{
+    padding-left: 10px;
+}
+.commit-time-line-body-branch {
+    max-width: 170px;
+    background-color: gray;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 5px;
+    padding-right: 0px;
+    font-size: 12px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+    width: min-content;
 }
