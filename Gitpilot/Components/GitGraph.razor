@@ -1,5 +1,7 @@
-﻿@using Gitpilot.Helpers
+﻿@using Gitpilot.Components.SvgGraphPart
+@using Gitpilot.Helpers
 @using Gitpilot.Models
+@using Gitpilot.Models.ViewModels
 @using Gitpilot.Services.Interfaces
 @inject IServiceProvider serviceProvider
 @inject IGitRepositoryService gitRepositoryService
@@ -14,10 +16,15 @@
         @foreach(var commit in GitRepository.Commits)
         {
             <tr class="commit-time-line-body-row">
-                <td class="commit-time-line-body-branch-td"><div class="commit-time-line-body-branch">@commit.BranchName</div> </td>
+                <td class="commit-time-line-body-branch-td"><div class="commit-time-line-body-branch"style="background-color: @(_gitBranchViewModels.FirstOrDefault(g => g.BranchName.EndsWith(commit.BranchName))?.RgbColor ?? "")">@commit.BranchName</div> </td>
                 <td class="commit-time-line-body-graph" >
-                    <svg height="20px" >
-                        <circle cx="20" cy="10" r="10" fill="rgb(0, 200, 255)"></circle>
+                    <svg height="26px" >
+                        @if(IsTopCommit(commit, out var fistGitBranchViewModel)){
+                            <SvgTopCommit LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" RgbColor="@fistGitBranchViewModel.RgbColor" />
+                        }else{
+                            GetGitBranchViewModel(commit, out var gitBranchViewModel);
+                            <SvgCommit LineIndex="@(_gitBranchViewModels.IndexOf(gitBranchViewModel)+1)" RgbColor="@gitBranchViewModel.RgbColor" />
+                        }
                     </svg>
                 </td>
                 <td><span class="commit-time-line-body-commit-message">@commit.Message</span></td>
@@ -28,6 +35,7 @@
 
 @code {
     [Parameter] public GitRepository GitRepository { get; set; }
+    private List<GitBranchViewModel> _gitBranchViewModels = new List<GitBranchViewModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,5 +54,24 @@
             GitRepository.Commits = gitRepositoryService.GetCommits(GitRepository.LibGitRepository);
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private bool IsTopCommit(GitCommit commit, out GitBranchViewModel gitBranchViewModel)
+    {
+        var isRigestered = _gitBranchViewModels.Any(g => g.BranchName.Equals(commit.BranchName, StringComparison.OrdinalIgnoreCase));
+        if (!isRigestered)
+        {
+            _gitBranchViewModels.Add(new GitBranchViewModel
+                {
+                    BranchName = commit.BranchName
+                });
+        }
+
+        gitBranchViewModel = _gitBranchViewModels.FirstOrDefault(g => g.BranchName.Equals(commit.BranchName, StringComparison.OrdinalIgnoreCase));
+        return GitRepository.Commits.Where(c => c.BranchName.Equals(commit.BranchName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Hash == commit.Hash;
+    }
+    private void GetGitBranchViewModel(GitCommit commit, out GitBranchViewModel gitBranchViewModel)
+    {
+        gitBranchViewModel = _gitBranchViewModels.FirstOrDefault(g => g.BranchName.Equals(commit.BranchName, StringComparison.OrdinalIgnoreCase));
     }
 }

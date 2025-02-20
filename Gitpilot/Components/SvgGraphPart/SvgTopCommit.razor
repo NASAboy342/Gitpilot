@@ -1,0 +1,11 @@
+﻿<circle cx="@_positionX" cy="13" r="10" fill="@RgbColor"></circle>
+<line x1="@_positionX" x2="@_positionX" y1="13" y2="26" stroke="@RgbColor" stroke-width="3"></line>
+
+@code {
+    [Parameter]
+    public int LineIndex { get; set; } = 1;
+    [Parameter]
+    public string RgbColor { get; set; } = "rgb(0, 120, 150)";
+
+    private int _positionX => LineIndex * 10 * 2;
+}

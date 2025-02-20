@@ -58,3 +58,6 @@
     border-radius: 3px;
     width: min-content;
 }
+.commit-time-line-body-graph{
+    padding: 0px;
+}
