@@ -3,8 +3,10 @@
 @using Gitpilot.Models
 @using Gitpilot.Models.ViewModels
 @using Gitpilot.Services.Interfaces
+@using Newtonsoft.Json
 @inject IServiceProvider serviceProvider
 @inject IGitRepositoryService gitRepositoryService
+@inject IJSRuntime JS
 
 <div class="container">
     <table class="commit-time-line-table">
@@ -16,14 +18,51 @@
         @foreach(var commit in GitRepository.Commits)
         {
             <tr class="commit-time-line-body-row">
-                <td class="commit-time-line-body-branch-td"><div class="commit-time-line-body-branch"style="background-color: @(_gitBranchViewModels.FirstOrDefault(g => g.BranchName.EndsWith(commit.BranchName))?.RgbColor ?? "")">@commit.BranchName</div> </td>
+                <td class="commit-time-line-body-branch-td"><div class="commit-time-line-body-branch" style="background-color: @(_gitBranchViewModels.FirstOrDefault(g => g.BranchName.EndsWith(commit.BranchName))?.RgbColor ?? "")"> <span class="commit-time-line-body-branch-name">@commit.BranchName</span> </div> </td>
                 <td class="commit-time-line-body-graph" >
                     <svg height="26px" >
                         @if(IsTopCommit(commit, out var fistGitBranchViewModel)){
-                            <SvgTopCommit LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" RgbColor="@fistGitBranchViewModel.RgbColor" />
-                        }else{
-                            GetGitBranchViewModel(commit, out var gitBranchViewModel);
-                            <SvgCommit LineIndex="@(_gitBranchViewModels.IndexOf(gitBranchViewModel)+1)" RgbColor="@gitBranchViewModel.RgbColor" />
+                            if (commit.IsAMergeCommit)
+                            {
+                                GetMergeFromGitBranchViewModel(commit, out var firstMergeFromGitBranchViewModel);
+                                <SvgMergeFrom 
+                                LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" 
+                                RgbColor="@fistGitBranchViewModel.RgbColor"
+                                FromLineIndex="@(_gitBranchViewModels.IndexOf(firstMergeFromGitBranchViewModel)+1)"
+                                FromRgbColor="@(firstMergeFromGitBranchViewModel.RgbColor)"
+                                />
+                            }
+                            else
+                            {
+                                <SvgTopCommit LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" RgbColor="@fistGitBranchViewModel.RgbColor" />
+                            }
+                        }
+                        else{
+                            if (commit.IsAMergeCommit)
+                            {
+                                GetMergeFromGitBranchViewModel(commit, out var mergeFromGitBranchViewModel);
+                                <SvgMergeFrom 
+                                LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" 
+                                RgbColor="@fistGitBranchViewModel.RgbColor"
+                                FromLineIndex="@(_gitBranchViewModels.IndexOf(mergeFromGitBranchViewModel)+1)"
+                                FromRgbColor="@(mergeFromGitBranchViewModel.RgbColor)"
+                                />
+                            }
+                            else
+                            {
+                                GetGitBranchViewModel(commit, out var gitBranchViewModel);
+                                <SvgCommit LineIndex="@(_gitBranchViewModels.IndexOf(gitBranchViewModel)+1)" RgbColor="@gitBranchViewModel.RgbColor" />
+                            }
+
+                        }
+                        @{
+                            var otherBranches = _gitBranchViewModels.Where(g => g.BranchName != commit.BranchName).ToList();
+                            foreach (var otherBranch in otherBranches){
+                                if (IsDrawThisOtherBranchLine(otherBranch, commit))
+                                {
+                                    <SvgBranchLine LineIndex="@(_gitBranchViewModels.IndexOf(otherBranch)+1)" RgbColor="@otherBranch.RgbColor"/>
+                                }
+                            }
                         }
                     </svg>
                 </td>
@@ -32,6 +71,12 @@
         }
     </table>
 </div>
+
+<script>
+    window.logToConsole = (message) => {
+    console.log(message);
+    };
+</script>
 
 @code {
     [Parameter] public GitRepository GitRepository { get; set; }
@@ -42,7 +87,7 @@
         Task.Run(() => GetCommits());
     }
 
-    private async Task GetCommits()
+    public async Task GetCommits()
     {
         using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Loading git-graph data"))
         {
@@ -52,7 +97,7 @@
                 await Task.Delay(TimeSpan.FromSeconds(0.5));
             }
             GitRepository.Commits = gitRepositoryService.GetCommits(GitRepository.LibGitRepository);
-            await InvokeAsync(StateHasChanged);
+            await this.InvokeAsync(this.StateHasChanged);
         }
     }
 
@@ -73,5 +118,15 @@
     private void GetGitBranchViewModel(GitCommit commit, out GitBranchViewModel gitBranchViewModel)
     {
         gitBranchViewModel = _gitBranchViewModels.FirstOrDefault(g => g.BranchName.Equals(commit.BranchName, StringComparison.OrdinalIgnoreCase));
+    }
+    private bool IsDrawThisOtherBranchLine(GitBranchViewModel otherBranchViewModel, GitCommit currentCommit)
+    {
+        return currentCommit.CommitTime <= GitRepository.Commits.FirstOrDefault(g => g.BranchName == otherBranchViewModel.BranchName)?.CommitTime;
+    }
+    private void GetMergeFromGitBranchViewModel(GitCommit commit, out GitBranchViewModel gitBranchViewModel)
+    {
+        var fromCommit = GitRepository.Commits.FirstOrDefault(c => c.Hash.Equals(commit.MergeFrom));
+        IsTopCommit(fromCommit, out var gitBranchViewModel1);
+        gitBranchViewModel = _gitBranchViewModels.FirstOrDefault(g => g.BranchName.Equals(fromCommit.BranchName));
     }
 }

@@ -28,10 +28,16 @@ namespace Gitpilot.Repositories
             return gits.OrderByDescending(g => g.Id).FirstOrDefault() ?? new LastSelectedGitRepository();
         }
 
+        public async Task<List<RemoteAccountInfo>> GetRemoteAccountInfos()
+        {
+            return await GetItemsAsync<RemoteAccountInfo>();
+        }
+
         public override async Task InitializeTablesAsync()
         {
             await CreateTableAsync<GitRepository>();
             await CreateTableAsync<LastSelectedGitRepository>();
+            await CreateTableAsync<RemoteAccountInfo>();
         }
 
         public async Task<int> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository)

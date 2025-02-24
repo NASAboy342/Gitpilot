@@ -2,7 +2,7 @@
 @using Newtonsoft.Json
 <div class="container">
     <div class="section" id="local">
-        <div class="folder" onclick="toggleFolder(this)">📂 LOCAL</div>
+        <div class="folder open" onclick="toggleFolder(this)">📂 LOCAL</div>
         <div class="branches">
             @foreach (var branch in LocalBranches.Where(lb => !lb.IsAFolder))
             {

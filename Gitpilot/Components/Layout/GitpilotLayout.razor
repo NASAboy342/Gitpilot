@@ -17,7 +17,7 @@
 
 <div class="page">
     <article class="content">
-        <GitGraph GitRepository="_gitRepository" />
+        <GitGraph GitRepository="_gitRepository" @ref="gitGraphComponent" />
     </article>
     <div class="side-nav-bar">
         <div class="gitbranch-info">
@@ -32,7 +32,14 @@
             <div class="gitpiot-name">Gitpilot</div>
         </div>
         <div class="git-status-container">
-            <GitStatus Options="_allRepoNames" CurrentRepository="@_gitRepository.Name" OnSelectRepository="HandleSwitchRepo" CurrentBranch="@_gitRepository.CurrenBranch.Name" OnClickPlushIcon="TuggleCustomDialogVisibility"></GitStatus>
+            <GitStatus 
+            Options="_allRepoNames" 
+            CurrentRepository="@_gitRepository.Name" 
+            OnSelectRepository="HandleSwitchRepo" 
+            CurrentBranch="@_gitRepository.CurrenBranch.Name" 
+            OnClickPlushIcon="TuggleCustomDialogVisibility"
+            OnClickGitFetch="FetchRepo"
+            ></GitStatus>
         </div>
     </div>
     <CustomDialog IsVisible=isCustomDialogVisible OnVisibilityFalse="TuggleCustomDialogVisibility">
@@ -53,6 +60,7 @@
     private List<string> _allRepoNames => _allOpenedGitRepositories.Select(g => g.Name).ToList();
     private Timer _timer;
     private bool _isSyncRepoDone = true;
+    private GitGraph gitGraphComponent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,6 +124,7 @@
             if (selectedRepository != null)
             {
                 _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepository.Path }).GitRepositoryData;
+                Task.Run(() => gitGraphComponent.GetCommits());
             }
         }
     }
@@ -142,6 +151,13 @@
                 });
 
             _gitRepository = swichtToBranchResponse.Repository;
+        }
+    }
+    private async Task FetchRepo()
+    {
+        using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Fetching repo"))
+        {
+            await gitRepositoryService.FetchRepo(_gitRepository);
         }
     }
 }

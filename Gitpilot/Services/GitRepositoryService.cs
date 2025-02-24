@@ -13,6 +13,7 @@ using Gitpilot.Caches;
 using Gitpilot.Enums;
 using Gitpilot.Queues;
 using IEnumerable.ForEach;
+using LibGit2Sharp.Handlers;
 
 namespace Gitpilot.Services
 {
@@ -54,7 +55,7 @@ namespace Gitpilot.Services
         public List<GitCommit> GetCommits(Repository repository)
         {
             var allcommits = new List<GitCommit>();
-            repository.Branches.ForEach(branch =>
+            repository.Branches.Where(branch => !branch.FriendlyName.StartsWith("origin")).ForEach(branch =>
             {
                 allcommits.AddRange(branch.Commits.Where(commit => commit.Committer.When > DateTime.Now.AddDays(-7)).Select(commit => new GitCommit
                 {
@@ -69,11 +70,11 @@ namespace Gitpilot.Services
             allcommits = allcommits.OrderByDescending(c => c.CommitTime).GroupBy(c => c.Hash).Select(c => new GitCommit
             {
                 Hash = c.Key,
-                BranchName = c.First().BranchName,
-                Message = c.First().Message,
-                CommitTime = c.First().CommitTime,
-                IsAMergeCommit = c.First().IsAMergeCommit,
-                MergeFrom = c.First().MergeFrom
+                BranchName = c.Last().BranchName,
+                Message = c.Last().Message,
+                CommitTime = c.Last().CommitTime,
+                IsAMergeCommit = c.Last().IsAMergeCommit,
+                MergeFrom = c.Last().MergeFrom
             }).ToList();
             return allcommits;
         }
@@ -202,6 +203,37 @@ namespace Gitpilot.Services
             gitRepository.NotStagedChanges = GetNotStagedChanges(gitRepository.LibGitRepository);
             gitRepository.StagedChanges = GetStagedChanges(gitRepository.LibGitRepository);
             gitRepository.Stashes = GetStashes(gitRepository.LibGitRepository);
+        }
+
+        public Task<BaseResponse> FetchRepo(GitRepository gitRepository)
+        {
+            try
+            {
+                var repo = gitRepository.LibGitRepository;
+                var remote = repo.Network.Remotes.First();
+                var refSpecs = remote.FetchRefSpecs.Select(r => r.Specification);
+                var fetchOptions = new FetchOptions
+                {
+                    CredentialsProvider = new CredentialsHandler((url, username, allowedTypes) =>
+                        new UsernamePasswordCredentials
+                        {
+                            Username = "git",
+                            Password = "your-github-personal-access-token"
+                        })
+                };
+                //Commands.Fetch(repo, remote.Name, refSpecs, fetchOptions, "Fetching from remote");
+
+                var success = new BaseResponse { ErrorCode = 0, ErrorMessage = "Fetching success" };
+                _messageQueue.Send(success);
+                return Task.FromResult(success);
+
+            }
+            catch(Exception ex)
+            {
+                var error = new BaseResponse(ex);
+                _messageQueue.Send(error);
+                return Task.FromResult(error);
+            }
         }
     }
 }

@@ -11,8 +11,8 @@
     <div class="quick-access-bar">
         <button>Undo    </button>
         <button>Redo    </button>
-        <button>Fetch   </button>
-        <button>Pull    </button>
+        <button @onclick="TriggerGitFetch">Fetch   </button>
+        <button @onclick="TriggerGitPull">Pull    </button>
         <button>Push    </button>
         <button>Branch  </button>
         <button>Stash   </button>
@@ -29,6 +29,14 @@
     [Parameter] public string CurrentBranch { get; set; } = "";
     [Parameter] public string CurrentRepository { get; set; } = "";
     [Parameter] public EventCallback OnClickPlushIcon { get; set; }
+    [Parameter] public EventCallback OnClickGitFetch { get; set; }
+    [Parameter] public EventCallback OnClickGitPull { get; set; }
+    [Parameter] public EventCallback OnClickGitPush { get; set; }
+    [Parameter] public EventCallback OnClickGitBranchOut { get; set; }
+    [Parameter] public EventCallback OnClickGitStash { get; set; }
+    [Parameter] public EventCallback OnClickGitPop { get; set; }
+    [Parameter] public EventCallback OnClickUndo { get; set; }
+    [Parameter] public EventCallback OnClickRedo { get; set; }
 
     private async Task HandleSelectRepo(string selectedRepo)
     {
@@ -38,5 +46,14 @@
     private void TuggleCustomDialogVisibility()
     {
         OnClickPlushIcon.InvokeAsync();
+    }
+
+    private void TriggerGitFetch()
+    {
+        OnClickGitFetch.InvokeAsync();
+    }
+    private void TriggerGitPull()
+    {
+        OnClickGitPull.InvokeAsync();
     }
 }

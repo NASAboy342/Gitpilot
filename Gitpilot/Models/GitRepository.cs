@@ -1,4 +1,5 @@
 ﻿
+using Gitpilot.Enums;
 using LibGit2Sharp;
 using SQLite;
 
@@ -17,5 +18,9 @@ namespace Gitpilot.Models
         [Ignore] public List<GitStash> Stashes { get; set; } = [];
         [Ignore] public Repository LibGitRepository { get; set; }
         [Ignore] public List<GitCommit> Commits { get; set; } = [];
+        public string RemoteAccountUserName { get; set; } = "";
+        public string RemoteAccountPassword { get; set; } = "";
+        public GitPlatFormEnum GitPlatForm { get; set; } = GitPlatFormEnum.Custom;
+        public string CustomPlatFormName { get; set; } = "";
     }
 }

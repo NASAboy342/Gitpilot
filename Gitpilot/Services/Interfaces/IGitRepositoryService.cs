@@ -20,5 +20,6 @@ namespace Gitpilot.Services.Interfaces
         Task<SwichtToBranchResponse> SwichtToBranch(SwichtToBranchParam param);
         void SyncRepoStatus(GitRepository gitRepository);
         List<GitCommit> GetCommits(Repository repository);
+        Task<BaseResponse> FetchRepo(GitRepository gitRepository);
     }
 }
