@@ -2,11 +2,13 @@
 @using Gitpilot.Helpers
 @using Gitpilot.Models
 @using Gitpilot.Models.ViewModels
+@using Gitpilot.Queues
 @using Gitpilot.Services.Interfaces
 @using Newtonsoft.Json
 @inject IServiceProvider serviceProvider
 @inject IGitRepositoryService gitRepositoryService
 @inject IJSRuntime JS
+@inject MessageQueue messageQueue
 
 <div class="container">
     <table class="commit-time-line-table">
@@ -22,10 +24,11 @@
                 <td class="commit-time-line-body-graph" >
                     <svg height="26px" >
                         @if(IsTopCommit(commit, out var fistGitBranchViewModel)){
+                            <SvgFillGuider LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" RgbColor="@fistGitBranchViewModel.RgbColor" />
                             if (commit.IsAMergeCommit)
                             {
                                 GetMergeFromGitBranchViewModel(commit, out var firstMergeFromGitBranchViewModel);
-                                <SvgMergeFrom 
+                                <SvgTopMergeFrom 
                                 LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" 
                                 RgbColor="@fistGitBranchViewModel.RgbColor"
                                 FromLineIndex="@(_gitBranchViewModels.IndexOf(firstMergeFromGitBranchViewModel)+1)"
@@ -38,19 +41,21 @@
                             }
                         }
                         else{
+                            GetGitBranchViewModel(commit, out var gitBranchViewModel);
+                            <SvgFillGuider LineIndex="@(_gitBranchViewModels.IndexOf(gitBranchViewModel)+1)" RgbColor="@gitBranchViewModel.RgbColor" />
                             if (commit.IsAMergeCommit)
                             {
                                 GetMergeFromGitBranchViewModel(commit, out var mergeFromGitBranchViewModel);
                                 <SvgMergeFrom 
-                                LineIndex="@(_gitBranchViewModels.IndexOf(fistGitBranchViewModel)+1)" 
-                                RgbColor="@fistGitBranchViewModel.RgbColor"
+                                LineIndex="@(_gitBranchViewModels.IndexOf(gitBranchViewModel)+1)"
+                                RgbColor="@gitBranchViewModel.RgbColor"
                                 FromLineIndex="@(_gitBranchViewModels.IndexOf(mergeFromGitBranchViewModel)+1)"
                                 FromRgbColor="@(mergeFromGitBranchViewModel.RgbColor)"
                                 />
                             }
                             else
                             {
-                                GetGitBranchViewModel(commit, out var gitBranchViewModel);
+
                                 <SvgCommit LineIndex="@(_gitBranchViewModels.IndexOf(gitBranchViewModel)+1)" RgbColor="@gitBranchViewModel.RgbColor" />
                             }
 
@@ -66,7 +71,10 @@
                         }
                     </svg>
                 </td>
-                <td><span class="commit-time-line-body-commit-message">@commit.Message</span></td>
+                @{
+                    GetGitBranchViewModel(commit, out var gitBranchViewModelForLeftBorder);
+                    <td style="border-left: 2px solid @gitBranchViewModelForLeftBorder.RgbColor"><span class="commit-time-line-body-commit-message">@commit.Message</span></td>
+                }
             </tr>
         }
     </table>
@@ -91,7 +99,8 @@
     {
         using (var loading = serviceProvider.GetRequiredService<Func<string, OnLoading>>()("Loading git-graph data"))
         {
-            if (GitRepository.Commits.Count > 0) return;
+            if (GitRepository.Commits.Count > 0) 
+                return;
             while (GitRepository.LibGitRepository == null)
             {
                 await Task.Delay(TimeSpan.FromSeconds(0.5));
@@ -117,6 +126,7 @@
     }
     private void GetGitBranchViewModel(GitCommit commit, out GitBranchViewModel gitBranchViewModel)
     {
+        IsTopCommit(commit, out var gitBranchViewModel1);
         gitBranchViewModel = _gitBranchViewModels.FirstOrDefault(g => g.BranchName.Equals(commit.BranchName, StringComparison.OrdinalIgnoreCase));
     }
     private bool IsDrawThisOtherBranchLine(GitBranchViewModel otherBranchViewModel, GitCommit currentCommit)
@@ -125,7 +135,7 @@
     }
     private void GetMergeFromGitBranchViewModel(GitCommit commit, out GitBranchViewModel gitBranchViewModel)
     {
-        var fromCommit = GitRepository.Commits.FirstOrDefault(c => c.Hash.Equals(commit.MergeFrom));
+        var fromCommit = GitRepository.Commits.FirstOrDefault(c => c.Hash.Equals(commit.MergeFrom)) ?? commit;
         IsTopCommit(fromCommit, out var gitBranchViewModel1);
         gitBranchViewModel = _gitBranchViewModels.FirstOrDefault(g => g.BranchName.Equals(fromCommit.BranchName));
     }

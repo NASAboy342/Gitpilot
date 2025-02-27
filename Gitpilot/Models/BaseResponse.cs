@@ -29,6 +29,13 @@ namespace Gitpilot.Models
             CreatedTime = DateTime.Now;
         }
 
+        public BaseResponse(string message)
+        {
+            ErrorCode = (int)ErrorEnum.Sucess;
+            ErrorMessage= message;
+            CreatedTime = DateTime.Now;
+        }
+
         public int ErrorCode { get; set; }
         public string ErrorMessage { get; set; }
         public DateTime CreatedTime { get; set; } = DateTime.Now;

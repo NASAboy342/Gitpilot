@@ -16,9 +16,9 @@
 @implements IDisposable
 
 <div class="page">
-    <article class="content">
+    <div class="content">
         <GitGraph GitRepository="_gitRepository" @ref="gitGraphComponent" />
-    </article>
+    </div>
     <div class="side-nav-bar">
         <div class="gitbranch-info">
             <GitBranchExplorer LocalBranches="_gitRepository.LocalBranches" RemoteBranches="_gitRepository.RemoteBranches" CurrentBranch="@_gitRepository.CurrenBranch.Name" OnSwitchBranch="SwichtToBranch"></GitBranchExplorer>
@@ -61,6 +61,7 @@
     private Timer _timer;
     private bool _isSyncRepoDone = true;
     private GitGraph gitGraphComponent;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -124,6 +125,7 @@
             if (selectedRepository != null)
             {
                 _gitRepository = gitRepositoryService.OpenRepository(new OpentRepoParam { DirectoryPath = selectedRepository.Path }).GitRepositoryData;
+                gitGraphComponent.GitRepository = _gitRepository;
                 Task.Run(() => gitGraphComponent.GetCommits());
             }
         }

@@ -55,12 +55,12 @@ namespace Gitpilot.Services
         public List<GitCommit> GetCommits(Repository repository)
         {
             var allcommits = new List<GitCommit>();
-            repository.Branches.Where(branch => !branch.FriendlyName.StartsWith("origin")).ForEach(branch =>
+            repository.Branches.Where(branch => branch.FriendlyName.StartsWith("origin") && !branch.FriendlyName.StartsWith("origin/HEAD")).ForEach(branch =>
             {
                 allcommits.AddRange(branch.Commits.Where(commit => commit.Committer.When > DateTime.Now.AddDays(-7)).Select(commit => new GitCommit
                 {
                     Hash = commit.Sha,
-                    BranchName = branch.FriendlyName,
+                    BranchName = branch.FriendlyName.Replace("origin/", ""),
                     Message = commit.MessageShort,
                     CommitTime = commit.Committer.When,
                     IsAMergeCommit = commit.Parents.Count() > 1,
@@ -185,6 +185,7 @@ namespace Gitpilot.Services
             {
                 var errorResult = new SwichtToBranchResponse
                 {
+                    Repository = param.Repository,
                     ErrorCode = 1,
                     ErrorMessage = $"{ex}",
                 };

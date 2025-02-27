@@ -1,9 +1,10 @@
 ﻿.container{
-    overflow:auto;
     padding: unset;
     margin: unset;
     position: relative;
     max-width: none;
+    overflow-y:scroll;
+    overflow-x:unset;
 }
 .commit-time-line-table{
     width: 100%;
