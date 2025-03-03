@@ -19,7 +19,7 @@ namespace Gitpilot.Services.Interfaces
         Task<SaveLastOpentGitRepositoryResponse> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository);
         Task<SwichtToBranchResponse> SwichtToBranch(SwichtToBranchParam param);
         void SyncRepoStatus(GitRepository gitRepository);
-        List<GitCommit> GetCommits(Repository repository);
+        List<GitCommit> GetCommits(Repository repository, DateTime startDate, DateTime endDate);
         Task<BaseResponse> FetchRepo(GitRepository gitRepository);
     }
 }

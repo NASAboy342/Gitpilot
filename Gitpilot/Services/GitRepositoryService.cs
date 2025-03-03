@@ -52,30 +52,40 @@ namespace Gitpilot.Services
             };
         }
 
-        public List<GitCommit> GetCommits(Repository repository)
+        public List<GitCommit> GetCommits(Repository repository, DateTime startDate, DateTime endDate)
         {
             var allcommits = new List<GitCommit>();
-            repository.Branches.Where(branch => branch.FriendlyName.StartsWith("origin") && !branch.FriendlyName.StartsWith("origin/HEAD")).ForEach(branch =>
+            repository.Branches
+                .Where(branch => branch.FriendlyName.StartsWith("origin") && !branch.FriendlyName.StartsWith("origin/HEAD"))
+                .OrderBy(b => repository.ObjectDatabase.FindMergeBase(b.Tip, repository.Head.Tip).Committer.When)
+                .ForEach(branch =>
             {
-                allcommits.AddRange(branch.Commits.Where(commit => commit.Committer.When > DateTime.Now.AddDays(-7)).Select(commit => new GitCommit
-                {
-                    Hash = commit.Sha,
-                    BranchName = branch.FriendlyName.Replace("origin/", ""),
-                    Message = commit.MessageShort,
-                    CommitTime = commit.Committer.When,
-                    IsAMergeCommit = commit.Parents.Count() > 1,
-                    MergeFrom = commit.Parents.Count() > 1 ? commit.Parents.ToList()[1].Sha : ""
-                }).ToList());
+                allcommits.AddRange(branch.Commits
+                    .Where(commit => commit.Committer.When > startDate && commit.Committer.When < endDate)
+                    .Select(commit => new GitCommit
+                    {
+                        Hash = commit.Sha,
+                        BranchName = branch.FriendlyName.Replace("origin/", ""),
+                        Message = commit.MessageShort,
+                        CommitTime = commit.Committer.When,
+                        IsAMergeCommit = commit.Parents.Count() > 1,
+                        MergeFrom = commit.Parents.Count() > 1 ? commit.Parents.ToList()[1].Sha : ""
+                    })
+                    .ToList());
             });
-            allcommits = allcommits.OrderByDescending(c => c.CommitTime).GroupBy(c => c.Hash).Select(c => new GitCommit
-            {
-                Hash = c.Key,
-                BranchName = c.Last().BranchName,
-                Message = c.Last().Message,
-                CommitTime = c.Last().CommitTime,
-                IsAMergeCommit = c.Last().IsAMergeCommit,
-                MergeFrom = c.Last().MergeFrom
-            }).ToList();
+            allcommits = allcommits
+                .OrderByDescending(c => c.CommitTime)
+                .GroupBy(c => c.Hash)
+                .Select(c => new GitCommit
+                {
+                    Hash = c.Key,
+                    BranchName = c.First().BranchName,
+                    Message = c.First().Message,
+                    CommitTime = c.First().CommitTime,
+                    IsAMergeCommit = c.First().IsAMergeCommit,
+                    MergeFrom = c.First().MergeFrom
+                })
+                .ToList();
             return allcommits;
         }
 

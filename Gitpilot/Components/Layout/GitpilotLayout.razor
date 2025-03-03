@@ -16,9 +16,9 @@
 @implements IDisposable
 
 <div class="page">
-    <div class="content">
+    <article class="content">
         <GitGraph GitRepository="_gitRepository" @ref="gitGraphComponent" />
-    </div>
+    </article>
     <div class="side-nav-bar">
         <div class="gitbranch-info">
             <GitBranchExplorer LocalBranches="_gitRepository.LocalBranches" RemoteBranches="_gitRepository.RemoteBranches" CurrentBranch="@_gitRepository.CurrenBranch.Name" OnSwitchBranch="SwichtToBranch"></GitBranchExplorer>

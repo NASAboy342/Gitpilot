@@ -3,8 +3,7 @@
     margin: unset;
     position: relative;
     max-width: none;
-    overflow-y:scroll;
-    overflow-x:unset;
+    overflow:auto;
 }
 .commit-time-line-table{
     width: 100%;
@@ -34,7 +33,7 @@
 }
 .commit-time-line-body-commit-message {
     display:block;
-    width: calc(100vw - 800px);
+    width: min-content;
     overflow:hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
