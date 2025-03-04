@@ -105,7 +105,8 @@
             {
                 await Task.Delay(TimeSpan.FromSeconds(0.5));
             }
-
+            GitRepository.Commits.Clear();
+            _gitBranchViewModels.Clear();
             GitRepository.Commits = gitRepositoryService.GetCommits(GitRepository.LibGitRepository, DateTime.Now.AddDays(-30), DateTime.Now);
             await this.InvokeAsync(this.StateHasChanged);
         

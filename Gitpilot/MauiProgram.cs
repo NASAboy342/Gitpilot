@@ -36,6 +36,7 @@ namespace Gitpilot
                 var onloadingQueue = serviceProvider.GetRequiredService<OnloadingQueue>();
                 return message => new OnLoading(onloadingQueue, message);
             });
+            builder.Services.AddSingleton<IAccountService, AccountService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

@@ -24,5 +24,6 @@ namespace Gitpilot.Enums
         NoChangesToMergeBase = 18,
         CacheReloadFailed = 19,
         NoRepositories = 20,
+        ProfileAlreadyExist = 21,
     }
 }

@@ -1,0 +1,36 @@
+﻿.container{
+    width: 250px;
+    height: 40px;
+    display: flex;
+    align-items:center;
+    padding: 10px;
+    gap: 10px;
+}
+.defualt-profile-img{
+    background-color:blueviolet;
+    width: 30px;
+    height: 30px;
+    padding: unset;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    font-size:26px;
+    font-weight: bold;
+    border-radius: 100%;
+}
+.user-name {
+    width: 100px;
+    display: flex;
+    justify-content:space-between;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0px 5px;
+    cursor: pointer;
+}
+    .user-name:hover {
+        background-color: var(--primary-color-hover);
+    }
+    .user-name:active {
+        background-color: var(--primary-color);
+    }

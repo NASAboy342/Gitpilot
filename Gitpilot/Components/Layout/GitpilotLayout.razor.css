@@ -65,4 +65,5 @@
 .git-status-container{
     position: relative;
     margin-left: 120px;
+    width: 100%;
 }

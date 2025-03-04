@@ -13,6 +13,7 @@ namespace Gitpilot.Repositories.Interfaces
         Task<LastSelectedGitRepository> GetLastSelectedGitRepository();
         Task<List<RemoteAccountInfo>> GetRemoteAccountInfos();
         Task<int> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository);
+        Task SaveRemoteAccountInfo(RemoteAccountInfo remoteAccountInfo);
         Task<int> SaveRepository(GitRepository repository);
     }
 }

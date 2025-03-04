@@ -45,6 +45,11 @@ namespace Gitpilot.Repositories
             return await SaveItemAsync(lastSelectedGitRepository);
         }
 
+        public async Task SaveRemoteAccountInfo(RemoteAccountInfo remoteAccountInfo)
+        {
+            await SaveItemAsync(remoteAccountInfo);
+        }
+
         public async Task<int> SaveRepository(GitRepository repository)
         {
             return await SaveItemAsync(repository); 
