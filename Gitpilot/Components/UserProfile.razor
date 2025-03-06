@@ -1,19 +1,44 @@
-﻿<div class="container">
-    <div class="img-container">
-        
-        @if (false)
-        {
-            <img src="#" alt="Alternate Text" />
-        }
-        else
-        {
-            <div class="defualt-profile-img">P</div>
-        }
-        
-    </div>
-    <div class="user-name"><span>Sopheaktra</span>  <span>⌟</span></div>
+﻿@using Gitpilot.Components.Common
+<div class="container">
+    @if (isHaveAnyAccount)
+    {
+        <div class="img-container">
+
+            @if (false)
+            {
+                <img src="#" alt="Alternate Text" />
+            }
+            else
+            {
+                <div class="defualt-profile-img">P</div>
+            }
+
+        </div>
+        <div class="user-name"><span>Sopheaktra</span>  <span>⌟</span></div>
+    }
+    else
+    {
+        <CustomDropdownDialog ButtonText="Add a profile" CustomClass="add-an-account-button" @ref="customDropdownDialog">
+            <AddProfile OnCancel="HandleCloseAddProfileDialog" OnAddProfile="HandleCloseAddProfileDialog" />
+        </CustomDropdownDialog>
+    }
+
 </div>
 
-@code {
+<style>
+    .add-an-account-button{
+    padding: 5px;
+    border: 1px solid var(--tin-border-on-primary-color);
+    border-radius: 5px;
+    }
+</style>
 
+@code {
+    private bool isHaveAnyAccount = false;
+    private CustomDropdownDialog customDropdownDialog;
+
+    private void HandleCloseAddProfileDialog()
+    {
+        customDropdownDialog.TuggleDropdownDialog();
+    }
 }

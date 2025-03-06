@@ -25,5 +25,6 @@
         SelectedOption = option;
         IsShowDropdownList = false;
         await OnOptionSelected.InvokeAsync(option);
+        StateHasChanged();
     }
 }

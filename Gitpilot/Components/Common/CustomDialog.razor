@@ -18,7 +18,7 @@
 @code {
     [Parameter] public bool IsVisible { get; set; } = true;
     [Parameter] public EventCallback<bool> OnVisibilityFalse { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; } 
 
     private void TuggleDialog()
     {

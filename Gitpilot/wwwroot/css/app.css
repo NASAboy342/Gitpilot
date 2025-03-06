@@ -6,6 +6,7 @@
     --primary-color-hover: rgb(61, 68, 82);
     --nonfocus-text-color: rgb(105, 107, 113);
     --tin-border-color: rgb(62, 64, 68);
+    --tin-border-on-primary-color: rgb(91, 94, 99);
 }
 
 body {
@@ -71,3 +72,30 @@ body {
         .custom-dropdown-list li:hover {
             background-color: var(--primary-color);
         }
+
+.custom-dropdown-dialog-container {
+    position: relative;
+}
+.custom-dropdown-dialog-btn {
+    background-color: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+    .custom-dropdown-dialog-btn:hover {
+        background-color: var(--primary-color-hover);
+    }
+.custom-dropdown-dialog {
+    display: none;
+    position: absolute;
+    background-color: var(--background-color);
+    border: 1px solid #ffffff33;
+    border-radius: 3px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: max-content;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: display 0.3s;
+}

@@ -1,0 +1,65 @@
+﻿@using Gitpilot.Components.Common
+@using Gitpilot.Enums
+@using Gitpilot.Enums.ViewEnum
+<div class="container">
+    <div>
+        <div>FlatForm</div>
+        <CustomDropdownList Options="@Platforms" SelectedOption="@SelectedPlatforms" OnOptionSelected="CheckOption"></CustomDropdownList>
+    </div>
+    @if (IsSetCustomPlatForm)
+    {
+        <div>
+            <div>Custom platform</div>
+            <input @bind="CustomPlatForm" />
+        </div>
+    }
+    <div>
+        <div>Username</div>
+        <input @bind="Username" />
+    </div>
+    <div>
+        <div>Email</div>
+        <input @bind="Email" />
+    </div>
+    <div>
+        <div>Password</div>
+        <input @bind="Password" />
+    </div>
+    <div class="button-section">
+        <CustomButton CustomClass="add-profile-button-style" OnClick="HandleCancel" >Cancel</CustomButton>
+        <CustomButton CustomClass="add-profile-button-style" ButtonType="ButtonTypeEnum.Positive" OnClick="HandleAddProfile">Add profile</CustomButton>
+    </div>
+</div>
+
+<style>
+    .add-profile-button-style{
+    font-size: 12px !important;
+    }
+</style>
+
+@code {
+    private List<string> Platforms = Enum.GetNames(typeof(GitPlatFormEnum)).ToList();
+    private string SelectedPlatforms = "Select a platform";
+    private string Username = "";
+    private string Email = "";
+    private string Password = "";
+    private string CustomPlatForm = "";
+    private bool IsSetCustomPlatForm;
+
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback OnAddProfile { get; set; }
+
+    private void CheckOption(string selectedOption){
+        SelectedPlatforms = selectedOption;
+        IsSetCustomPlatForm = SelectedPlatforms.Equals(GitPlatFormEnum.Custom.ToString());
+    }
+
+    private async Task HandleAddProfile(){
+        await OnAddProfile.InvokeAsync();
+    }
+
+    private async Task HandleCancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}

@@ -3,6 +3,7 @@
     height: 40px;
     display: flex;
     align-items:center;
+    justify-content:end;
     padding: 10px;
     gap: 10px;
 }
@@ -34,3 +35,4 @@
     .user-name:active {
         background-color: var(--primary-color);
     }
+

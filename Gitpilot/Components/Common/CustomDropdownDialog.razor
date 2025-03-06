@@ -1,0 +1,92 @@
+﻿@inject IJSRuntime JS
+
+<div class="custom-dropdown-dialog-container">
+    <button class="@($"custom-dropdown-dialog-btn {CustomClass}")" @onclick="TuggleDropdownDialog" id="@ButtonId">@ButtonText</button>
+    <div 
+    class="custom-dropdown-dialog" 
+    id="@DropdownId" 
+    style="top:@DropdownTop; left:@DropdownLeft; right:@DropdownRight; bottom:@DropdownBottom; display:@DropdownDisplayStyle">
+        @ChildContent
+    </div>
+</div>
+
+<script>
+    window.adjustDropdownPosition = (buttonId, dropdownId) => {
+    let btn = document.getElementById(buttonId);
+    let dropdown = document.getElementById(dropdownId);
+    if (!btn || !dropdown) return null;
+
+    dropdown.style.display = "block";
+    dropdown.style.visibility = "hidden";
+    let btnRect = btn.getBoundingClientRect();
+    let dropdownRect = dropdown.getBoundingClientRect();
+    let windowHeight = window.innerHeight;
+    let windowWidth = window.innerWidth;
+
+    let top = btnRect.top;
+    let left = btnRect.left;
+    let bottom = btnRect.bottom;
+    let right = btnRect.right;
+
+    let resultTop = 'auto';
+    let resultLeft = 'auto';
+    let resultBottom = 'auto';
+    let resultRight = 'auto';
+
+    if (left + dropdownRect.width > windowWidth) {
+    resultRight = '0px';
+    };
+
+    dropdown.style.visibility = "visible";
+    return {top: resultTop, left: resultLeft, right: resultRight, bottom: resultBottom, };
+    };
+</script>
+
+@code {
+    private bool IsShowDropdownDialog = false;
+    private string DropdownDisplayStyle => IsShowDropdownDialog ? "block" : "none";
+    private string DropdownTop { get; set; } = "auto";
+    private string DropdownLeft { get; set; } = "auto";
+    private string DropdownRight { get; set; } = "auto";
+    private string DropdownBottom { get; set; } = "auto";
+
+    private string ButtonId { get; } = $"btn_{Guid.NewGuid().ToString("N")}";
+    private string DropdownId { get; } = $"dropdown_{Guid.NewGuid().ToString("N")}";
+
+    [Parameter] public string ButtonText { get; set; } = "Drop dialog";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string CustomClass { get; set; } = "";
+
+    public async Task TuggleDropdownDialog()
+    {
+        IsShowDropdownDialog = !IsShowDropdownDialog;
+        if (IsShowDropdownDialog)
+        {
+            await AdjustDropdownPosition();
+        }
+    }
+
+    private async Task AdjustDropdownPosition()
+    {
+        var result = await JS.InvokeAsync<DropdownPositionResult>("adjustDropdownPosition", ButtonId, DropdownId);
+
+        if (result != null)
+        {
+            DropdownTop = result.Top;
+            DropdownLeft = result.Left;
+            DropdownRight = result.Right;
+            DropdownBottom = result.Bottom;
+            StateHasChanged();
+        }
+    }
+
+    private class DropdownPositionResult
+    {
+        public string Top { get; set; } = "auto";
+        public string Left { get; set; } = "auto";
+        public string Right { get; set; } = "auto";
+        public string Bottom { get; set; } = "auto";
+    }
+}
+
+
