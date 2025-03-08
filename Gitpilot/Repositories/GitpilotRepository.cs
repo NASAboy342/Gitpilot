@@ -54,5 +54,10 @@ namespace Gitpilot.Repositories
         {
             return await SaveItemAsync(repository); 
         }
+
+        public async Task UpdateAccountProfile(List<RemoteAccountInfo> remoteAccountInfo)
+        {
+            await UpdateItemsAsync(remoteAccountInfo);
+        }
     }
 }

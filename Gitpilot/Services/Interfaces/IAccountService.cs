@@ -10,5 +10,6 @@ namespace Gitpilot.Services.Interfaces
     public interface IAccountService
     {
         Task<BaseResponse> AddAccountProfile(RemoteAccountInfo remoteAccountInfo);
+        Task<BaseResponse> UpdateAccountProfile(List<RemoteAccountInfo> remoteAccountInfo);
     }
 }

@@ -1,12 +1,46 @@
-﻿<div class="custom-dropdown">
-    <button class="custom-dropdown-btn" @onclick="TuggleDropdownList">@SelectedOption ⌟</button>
-    <ul class="custom-dropdown-list" style="display:@DropdownDisplayStyle">
+﻿@inject IJSRuntime JS
+
+<div class="custom-dropdown">
+    <button id="@ButtonId" class="custom-dropdown-btn" @onclick="TuggleDropdownList">@SelectedOption ⌟</button>
+    <ul id="@DropdownId" class="custom-dropdown-list" style="top:@DropdownTop; left:@DropdownLeft; right:@DropdownRight; bottom:@DropdownBottom; display:@DropdownDisplayStyle">
         @foreach(var option in Options)
         {
             <li data-value="@option" @onclick="async () => { await SelectOption(option);}">@option</li>
         }
     </ul>
 </div>
+
+<script>
+    window.adjustDropdownPosition = (buttonId, dropdownId) => {
+    let btn = document.getElementById(buttonId);
+    let dropdown = document.getElementById(dropdownId);
+    if (!btn || !dropdown) return null;
+
+    dropdown.style.display = "block";
+    dropdown.style.visibility = "hidden";
+    let btnRect = btn.getBoundingClientRect();
+    let dropdownRect = dropdown.getBoundingClientRect();
+    let windowHeight = window.innerHeight;
+    let windowWidth = window.innerWidth;
+
+    let top = btnRect.top;
+    let left = btnRect.left;
+    let bottom = btnRect.bottom;
+    let right = btnRect.right;
+
+    let resultTop = 'auto';
+    let resultLeft = 'auto';
+    let resultBottom = 'auto';
+    let resultRight = 'auto';
+
+    if (left + dropdownRect.width > windowWidth) {
+    resultRight = '0px';
+    };
+
+    dropdown.style.visibility = "visible";
+    return {top: resultTop, left: resultLeft, right: resultRight, bottom: resultBottom, };
+    };
+</script>
 
 @code {
     private bool IsShowDropdownList = false;
@@ -15,9 +49,19 @@
     [Parameter] public EventCallback<string> OnOptionSelected { get; set; }
     [Parameter] public string SelectedOption { get; set; } = "Select an option";
 
+    private string ButtonId = $"btn_{Guid.NewGuid().ToString("N")}";
+    private string DropdownId = $"dropdown_{Guid.NewGuid().ToString("N")}";
+
+    private string DropdownTop { get; set; } = "auto";
+    private string DropdownLeft { get; set; } = "auto";
+    private string DropdownRight { get; set; } = "auto";
+    private string DropdownBottom { get; set; } = "auto";
+
     private void TuggleDropdownList()
     {
         IsShowDropdownList = !IsShowDropdownList;
+        if (IsShowDropdownList)
+            AdjustDropdownPosition();
     }
 
     private async Task SelectOption(string option)
@@ -26,5 +70,27 @@
         IsShowDropdownList = false;
         await OnOptionSelected.InvokeAsync(option);
         StateHasChanged();
+    }
+
+    private async Task AdjustDropdownPosition()
+    {
+        var result = await JS.InvokeAsync<DropdownListPositionResult>("adjustDropdownPosition", ButtonId, DropdownId);
+
+        if (result != null)
+        {
+            DropdownTop = result.Top;
+            DropdownLeft = result.Left;
+            DropdownRight = result.Right;
+            DropdownBottom = result.Bottom;
+            StateHasChanged();
+        }
+    }
+
+    private class DropdownListPositionResult
+    {
+        public string Top { get; set; } = "auto";
+        public string Left { get; set; } = "auto";
+        public string Right { get; set; } = "auto";
+        public string Bottom { get; set; } = "auto";
     }
 }

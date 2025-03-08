@@ -53,3 +53,5 @@ project.lock.json
 *.razor.g.i.cs
 obj/**/*.razor.g.cs
 obj/**/*.razor.g.i.cs
+
+.fake

@@ -2,7 +2,7 @@
 @using Newtonsoft.Json
 <div class="container">
     <div class="section" id="local">
-        <div class="folder open" onclick="toggleFolder(this)">📂 LOCAL</div>
+        <div class="folder open" onclick="toggleFolder(this)">📂 LOCAL (@(LocalBranches.Count))</div>
         <div class="branches">
             @foreach (var branch in LocalBranches.Where(lb => !lb.IsAFolder))
             {
@@ -30,7 +30,7 @@
     </div>
     @* <div class="draggable" id="dragBar"></div> *@
     <div class="section" id="remote">
-        <div class="folder" onclick="toggleFolder(this)">📂 REMOTE (74/74)</div>
+        <div class="folder" onclick="toggleFolder(this)">📂 REMOTE (@(RemoteBranches.Count))</div>
         <div class="branches">
             <div class="folder" onclick="toggleFolder(this)">🌐 Origin</div>
             <div class="branches">

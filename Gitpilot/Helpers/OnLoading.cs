@@ -14,6 +14,7 @@ namespace Gitpilot.Helpers
         private readonly OnloadingQueue _onloadingQueue;
         public OnLoading(OnloadingQueue onloadingQueue, string message = "")
         {
+            if (onloadingQueue == null || message == "") return;
             _onloadingQueue = onloadingQueue;
             CreateLoadingRequest(message);
 

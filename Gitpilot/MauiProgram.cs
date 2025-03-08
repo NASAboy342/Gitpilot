@@ -37,6 +37,7 @@ namespace Gitpilot
                 return message => new OnLoading(onloadingQueue, message);
             });
             builder.Services.AddSingleton<IAccountService, AccountService>();
+            builder.Services.AddSingleton<RemoteAccountInfoCache>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

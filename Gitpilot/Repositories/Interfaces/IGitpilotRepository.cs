@@ -15,5 +15,6 @@ namespace Gitpilot.Repositories.Interfaces
         Task<int> SaveLastOpentGitRepository(LastSelectedGitRepository lastSelectedGitRepository);
         Task SaveRemoteAccountInfo(RemoteAccountInfo remoteAccountInfo);
         Task<int> SaveRepository(GitRepository repository);
+        Task UpdateAccountProfile(List<RemoteAccountInfo> remoteAccountInfo);
     }
 }

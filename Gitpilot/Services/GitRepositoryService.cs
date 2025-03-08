@@ -207,6 +207,8 @@ namespace Gitpilot.Services
 
         public void SyncRepoStatus(GitRepository gitRepository)
         {
+            if (gitRepository == null || gitRepository.LibGitRepository == null)
+                return;
             gitRepository.LibGitRepository.RetrieveStatus();
             gitRepository.CurrenBranch = new GitBranch(gitRepository.LibGitRepository.Head.FriendlyName);
             gitRepository.LocalBranches = GetLocalBranches(gitRepository.LibGitRepository);

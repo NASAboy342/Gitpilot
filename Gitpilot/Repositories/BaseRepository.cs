@@ -52,6 +52,11 @@ namespace Gitpilot.Repositories
                 IsInitialized = true;
             }
         }
+        public async Task<int> UpdateItemsAsync<T>(T item) where T : IEnumerable<object>
+        {
+            await CheckToInitTables();
+            return await _database.UpdateAllAsync(item);
+        }
         public abstract Task InitializeTablesAsync();
     }
 }

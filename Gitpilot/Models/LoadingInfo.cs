@@ -8,6 +8,7 @@ namespace Gitpilot.Models
 {
     public class LoadingInfo
     {
+        public LoadingInfo() { }
         public LoadingInfo(string hash)
         {
             LoadingHash = hash;

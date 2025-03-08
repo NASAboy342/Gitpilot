@@ -1,6 +1,12 @@
 ﻿@using Gitpilot.Components.Common
 @using Gitpilot.Enums
 @using Gitpilot.Enums.ViewEnum
+@using Gitpilot.Models
+@using Gitpilot.Queues
+@using Gitpilot.Services.Interfaces
+@inject MessageQueue messageQueue
+@inject IAccountService accountService
+
 <div class="container">
     <div>
         <div>FlatForm</div>
@@ -26,7 +32,7 @@
         <input @bind="Password" />
     </div>
     <div class="button-section">
-        <CustomButton CustomClass="add-profile-button-style" OnClick="HandleCancel" >Cancel</CustomButton>
+        <CustomButton CustomClass="add-profile-button-style" OnClick="HandleCancel">Cancel</CustomButton>
         <CustomButton CustomClass="add-profile-button-style" ButtonType="ButtonTypeEnum.Positive" OnClick="HandleAddProfile">Add profile</CustomButton>
     </div>
 </div>
@@ -55,11 +61,49 @@
     }
 
     private async Task HandleAddProfile(){
-        await OnAddProfile.InvokeAsync();
+        try
+        {
+            var request = new RemoteAccountInfo
+            {
+                CustomPlatFormName = CustomPlatForm,
+                GitPlatForm = (GitPlatFormEnum)Enum.Parse(typeof(GitPlatFormEnum), SelectedPlatforms),
+                UserName = Username,
+                Password = Password,
+                Email = Email,
+            };
+            var result = await accountService.AddAccountProfile(request);
+
+            if(result.ErrorCode != 0)
+            {
+                messageQueue.Send(result);
+            }
+            else
+            {
+                messageQueue.Send(new BaseResponse("Profile has been added"));
+                ClearInput();
+            }
+
+            await OnAddProfile.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            messageQueue.Send(new BaseResponse(ex));
+        }
     }
 
     private async Task HandleCancel()
     {
         await OnCancel.InvokeAsync();
+        ClearInput();
+    }
+
+    private void ClearInput()
+    {
+        SelectedPlatforms = "Select a platform";
+        Username = "";
+        Email = "";
+        Password = "";
+        CustomPlatForm = "";
+        IsSetCustomPlatForm = false;
     }
 }

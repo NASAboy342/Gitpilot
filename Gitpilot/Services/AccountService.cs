@@ -35,6 +35,13 @@ namespace Gitpilot.Services
             return new BaseResponse();
         }
 
+        public async Task<BaseResponse> UpdateAccountProfile(List<RemoteAccountInfo> remoteAccountInfo)
+        {
+            await _gitpilotRepository.UpdateAccountProfile(remoteAccountInfo);
+            await _remoteAccountInfoCache.GetAllAsyns(true);
+            return new BaseResponse();
+        }
+
         private async Task<bool> IsProfileAlreadyExist(RemoteAccountInfo remoteAccountInfo)
         {
             var allProfiles = await _remoteAccountInfoCache.GetAllAsyns();

@@ -1,4 +1,12 @@
-﻿@using Gitpilot.Components.Common
+﻿@using Gitpilot.Caches
+@using Gitpilot.Components.Common
+@using Gitpilot.Models
+@using Gitpilot.Queues
+@using Gitpilot.Services.Interfaces
+@inject RemoteAccountInfoCache remoteAccountInfoCache
+@inject IAccountService accountService
+@inject MessageQueue messageQueue
+
 <div class="container">
     @if (isHaveAnyAccount)
     {
@@ -10,11 +18,18 @@
             }
             else
             {
-                <div class="defualt-profile-img">P</div>
+                <div class="defualt-profile-img">@(remoteAccountInfo.FirstOrDefault(a => a.IsStandingOn)?.UserName.ToUpper()[0] ?? '?')</div>
             }
 
         </div>
-        <div class="user-name"><span>Sopheaktra</span>  <span>⌟</span></div>
+        <CustomDropdownList 
+        Options="@(remoteAccountInfo.Select(a => $"{a.PlatFormName}: {a.UserName}").ToList())" 
+        SelectedOption="@(remoteAccountInfo.FirstOrDefault(a => a.IsStandingOn)?.UserName ?? "")"
+        OnOptionSelected="HandleSwitchProfile"
+        ></CustomDropdownList>
+        <CustomDropdownDialog ButtonText="+" @ref="customDropdownDialog">
+            <AddProfile OnCancel="HandleCloseAddProfileDialog" OnAddProfile="HandleCloseAddProfileDialog" />
+        </CustomDropdownDialog>
     }
     else
     {
@@ -36,9 +51,50 @@
 @code {
     private bool isHaveAnyAccount = false;
     private CustomDropdownDialog customDropdownDialog;
+    private List<RemoteAccountInfo> remoteAccountInfo = [];
 
-    private void HandleCloseAddProfileDialog()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProfiles();
+    }
+
+    private async Task HandleCloseAddProfileDialog()
     {
         customDropdownDialog.TuggleDropdownDialog();
+        await LoadProfiles();
+    }
+
+    private async Task LoadProfiles(bool isReloadCache = false)
+    {
+        remoteAccountInfo = await remoteAccountInfoCache.GetAllAsyns(isReloadCache);
+        isHaveAnyAccount = remoteAccountInfo.Any();
+        StateHasChanged();
+    }
+
+    private async Task HandleSwitchProfile(string selectedProfile)
+    {
+        try
+        {
+            var selectedPlatform = selectedProfile.Split()[0].Replace(":", "");
+            var selectedUsername = selectedProfile.Split()[1];
+
+            remoteAccountInfo.ForEach(profile =>
+            {
+                profile.IsStandingOn = profile.UserName.Equals(selectedUsername) && profile.PlatFormName.Equals(selectedPlatform);
+            });
+
+            var updateResult = await accountService.UpdateAccountProfile(remoteAccountInfo);
+            if (updateResult.ErrorCode == 0)
+            {
+                await LoadProfiles();
+                messageQueue.Send(new BaseResponse("witch account success"));
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            messageQueue.Send(new BaseResponse(ex));
+        }
+        
     }
 }

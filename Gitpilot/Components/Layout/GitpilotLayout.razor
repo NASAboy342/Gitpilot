@@ -17,7 +17,10 @@
 
 <div class="page">
     <article class="content">
-        <GitGraph GitRepository="_gitRepository" @ref="gitGraphComponent" />
+        @if (_allOpenedGitRepositories.Any())
+        {
+            <GitGraph GitRepository="_gitRepository" @ref="gitGraphComponent" />
+        }
     </article>
     <div class="side-nav-bar">
         <div class="gitbranch-info">
@@ -140,7 +143,13 @@
             var lastInsertedRepo = _allOpenedGitRepositories.OrderByDescending(r => r.Id).FirstOrDefault();
             var saveLastOpentGitRepositoryResponse = await gitRepositoryService.SaveLastOpentGitRepository(new LastSelectedGitRepository { GitRepositoryId = lastInsertedRepo.Id, Name = lastInsertedRepo.Name });
             await GetLastOpentRepository();
+            isCustomDialogVisible = false;
         }
+        Task.Run(() =>
+            {
+                while (gitGraphComponent == null) { }
+                gitGraphComponent.GetCommits();
+            });
     }
     private async Task SwichtToBranch(string branchName)
     {

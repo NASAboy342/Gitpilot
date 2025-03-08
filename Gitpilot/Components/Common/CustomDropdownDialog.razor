@@ -68,7 +68,7 @@
 
     private async Task AdjustDropdownPosition()
     {
-        var result = await JS.InvokeAsync<DropdownPositionResult>("adjustDropdownPosition", ButtonId, DropdownId);
+        var result = await JS.InvokeAsync<DropdownDialogPositionResult>("adjustDropdownPosition", ButtonId, DropdownId);
 
         if (result != null)
         {
@@ -80,7 +80,7 @@
         }
     }
 
-    private class DropdownPositionResult
+    private class DropdownDialogPositionResult
     {
         public string Top { get; set; } = "auto";
         public string Left { get; set; } = "auto";
